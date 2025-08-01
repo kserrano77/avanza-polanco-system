@@ -1,0 +1,32 @@
+📂 ARCHIVOS PARA SUBIR A GITHUB:
+
+✅ INCLUIR ESTOS ARCHIVOS/CARPETAS:
+- src/ (carpeta completa)
+- public/ (carpeta completa)
+- index.html
+- package.json
+- package-lock.json
+- vite.config.js
+- tailwind.config.js
+- postcss.config.js
+- .gitignore
+- netlify.toml
+- components.json (si existe)
+
+❌ NO SUBIR ESTOS ARCHIVOS/CARPETAS:
+- node_modules/ (muy pesado)
+- dist/ (se genera automáticamente)
+- .env (contiene credenciales secretas)
+- .env.local
+- .env.production
+- respaldo-automatico.cjs
+- hacer-respaldo.bat
+- crear-plantilla-escuela.bat
+- email-proxy.cjs
+
+📝 INSTRUCCIONES:
+1. Ve a tu repositorio en GitHub
+2. Haz clic en "uploading an existing file"
+3. Arrastra SOLO los archivos/carpetas marcados con ✅
+4. Mensaje de commit: "Initial commit - mobile optimized school system"
+5. Haz clic en "Commit changes"

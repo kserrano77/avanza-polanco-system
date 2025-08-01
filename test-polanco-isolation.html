@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Aislamiento - Instituto Polanco</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 5px solid #4CAF50;
+        }
+        .test-section.error {
+            border-left-color: #f44336;
+        }
+        .test-section.warning {
+            border-left-color: #ff9800;
+        }
+        .result {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .status {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .status.success {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        .status.error {
+            background: rgba(244, 67, 54, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏫 Test de Aislamiento - Instituto Polanco</h1>
+            <p>Verificación automática de separación de datos</p>
+        </div>
+
+        <div id="status" class="status">
+            ⏳ Preparando pruebas...
+        </div>
+
+        <button class="button" onclick="runAllTests()">🧪 Ejecutar Todas las Pruebas</button>
+        <button class="button" onclick="runConnectionTest()">📡 Test de Conexión</button>
+        <button class="button" onclick="runDataTest()">📊 Test de Datos</button>
+        <button class="button" onclick="clearResults()">🧹 Limpiar Resultados</button>
+
+        <div id="results"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración específica para Instituto Polanco
+        const POLANCO_CONFIG = {
+            url: 'https://asqymroylemsrrmfwako.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcXltcm95bGVtc3JybWZ3YWtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTUzODgsImV4cCI6MjA2OTQzMTM4OH0.mdAX12fcUf2SWEvSd1PMA9Nrubl_qVS9j8QucaMqGfo',
+            projectId: 'asqymroylemsrrmfwako',
+            expectedSchool: 'Instituto Polanco'
+        };
+
+        // Proyectos prohibidos (para verificar que NO estemos conectados a ellos)
+        const FORBIDDEN_PROJECTS = [
+            { id: 'gvrgepdjxzhgqkmtwcvs', name: 'Cd. Obregón' },
+            { id: 'iulokyhuaogovaynxqcl', name: 'Polanco Anterior' },
+            { id: 'txwplesyvhtseeinjkfs', name: 'Polanco Test' }
+        ];
+
+        // Inicializar cliente Supabase
+        const supabase = window.supabase.createClient(POLANCO_CONFIG.url, POLANCO_CONFIG.key);
+
+        let testResults = [];
+
+        function addResult(title, content, type = 'success') {
+            const resultsDiv = document.getElementById('results');
+            const section = document.createElement('div');
+            section.className = `test-section ${type}`;
+            section.innerHTML = `
+                <h3>${title}</h3>
+                <div class="result">${content}</div>
+            `;
+            resultsDiv.appendChild(section);
+            
+            testResults.push({ title, content, type, timestamp: new Date() });
+        }
+
+        function updateStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        async function runConnectionTest() {
+            addResult('🔍 Iniciando Test de Conexión', 'Verificando configuración de Supabase...');
+
+            try {
+                // Verificar URL correcta
+                const currentUrl = supabase.supabaseUrl;
+                if (currentUrl === POLANCO_CONFIG.url) {
+                    addResult('✅ URL de Conexión', `Correcto: ${currentUrl}`, 'success');
+                } else {
+                    addResult('❌ URL de Conexión', `INCORRECTO: ${currentUrl}\nEsperado: ${POLANCO_CONFIG.url}`, 'error');
+                }
+
+                // Verificar que NO esté conectado a proyectos prohibidos
+                let prohibitedDetected = false;
+                for (const forbidden of FORBIDDEN_PROJECTS) {
+                    if (currentUrl.includes(forbidden.id)) {
+                        addResult('🚨 CONEXIÓN PROHIBIDA', `Detectada conexión a ${forbidden.name} (${forbidden.id})`, 'error');
+                        prohibitedDetected = true;
+                    }
+                }
+
+                if (!prohibitedDetected) {
+                    addResult('✅ Verificación de Proyectos Prohibidos', 'No se detectaron conexiones prohibidas', 'success');
+                }
+
+                // Test de conexión real
+                const { data, error } = await supabase.from('school_settings').select('*').limit(1);
+                
+                if (error) {
+                    addResult('❌ Test de Conexión Real', `Error: ${error.message}`, 'error');
+                } else {
+                    addResult('✅ Test de Conexión Real', 'Conexión exitosa a la base de datos', 'success');
+                }
+
+            } catch (error) {
+                addResult('💥 Error en Test de Conexión', `Error inesperado: ${error.message}`, 'error');
+            }
+        }
+
+        async function runDataTest() {
+            addResult('🔍 Iniciando Test de Datos', 'Verificando aislamiento de datos...');
+
+            try {
+                // Test 1: Verificar configuración de escuela
+                const { data: schoolData, error: schoolError } = await supabase
+                    .from('school_settings')
+                    .select('school_name, school_code')
+                    .limit(1);
+
+                if (schoolError) {
+                    addResult('❌ Configuración de Escuela', `Error: ${schoolError.message}`, 'error');
+                } else if (schoolData && schoolData.length > 0) {
+                    const school = schoolData[0];
+                    if (school.school_name === POLANCO_CONFIG.expectedSchool) {
+                        addResult('✅ Configuración de Escuela', `Correcto: ${school.school_name} (${school.school_code})`, 'success');
+                    } else {
+                        addResult('⚠️ Configuración de Escuela', `Nombre inesperado: ${school.school_name}`, 'warning');
+                    }
+                } else {
+                    addResult('⚠️ Configuración de Escuela', 'No se encontró configuración de escuela', 'warning');
+                }
+
+                // Test 2: Verificar estudiantes (debe ser independiente)
+                const { data: studentsData, error: studentsError } = await supabase
+                    .from('students')
+                    .select('id, first_name, last_name, student_number')
+                    .limit(10);
+
+                if (studentsError) {
+                    addResult('❌ Test de Estudiantes', `Error: ${studentsError.message}`, 'error');
+                } else {
+                    const count = studentsData?.length || 0;
+                    addResult('✅ Test de Estudiantes', `Encontrados ${count} estudiantes en la base de datos`, 'success');
+                    
+                    if (count > 0) {
+                        const sampleStudent = studentsData[0];
+                        addResult('📋 Muestra de Estudiante', `ID: ${sampleStudent.id}\nNombre: ${sampleStudent.first_name} ${sampleStudent.last_name}\nNúmero: ${sampleStudent.student_number}`, 'success');
+                    }
+                }
+
+                // Test 3: Verificar pagos
+                const { data: paymentsData, error: paymentsError } = await supabase
+                    .from('payments')
+                    .select('id, amount, payment_date, concept')
+                    .limit(5);
+
+                if (paymentsError) {
+                    addResult('❌ Test de Pagos', `Error: ${paymentsError.message}`, 'error');
+                } else {
+                    const count = paymentsData?.length || 0;
+                    addResult('✅ Test de Pagos', `Encontrados ${count} pagos en la base de datos`, 'success');
+                }
+
+                // Test 4: Verificar cursos
+                const { data: coursesData, error: coursesError } = await supabase
+                    .from('courses')
+                    .select('id, name, price')
+                    .limit(5);
+
+                if (coursesError) {
+                    addResult('❌ Test de Cursos', `Error: ${coursesError.message}`, 'error');
+                } else {
+                    const count = coursesData?.length || 0;
+                    addResult('✅ Test de Cursos', `Encontrados ${count} cursos disponibles`, 'success');
+                    
+                    if (count > 0) {
+                        const coursesList = coursesData.map(c => `• ${c.name} - $${c.price}`).join('\n');
+                        addResult('📚 Cursos Disponibles', coursesList, 'success');
+                    }
+                }
+
+            } catch (error) {
+                addResult('💥 Error en Test de Datos', `Error inesperado: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            updateStatus('🧪 Ejecutando todas las pruebas...', 'success');
+
+            await runConnectionTest();
+            await runDataTest();
+
+            // Generar resumen final
+            const errors = testResults.filter(r => r.type === 'error').length;
+            const warnings = testResults.filter(r => r.type === 'warning').length;
+            const successes = testResults.filter(r => r.type === 'success').length;
+
+            let finalStatus, finalType;
+            if (errors > 0) {
+                finalStatus = `❌ PRUEBAS FALLIDAS: ${errors} errores, ${warnings} advertencias, ${successes} éxitos`;
+                finalType = 'error';
+            } else if (warnings > 0) {
+                finalStatus = `⚠️ PRUEBAS CON ADVERTENCIAS: ${warnings} advertencias, ${successes} éxitos`;
+                finalType = 'warning';
+            } else {
+                finalStatus = `✅ TODAS LAS PRUEBAS EXITOSAS: ${successes} pruebas pasaron correctamente`;
+                finalType = 'success';
+            }
+
+            updateStatus(finalStatus, finalType);
+
+            // Generar reporte final
+            const report = {
+                timestamp: new Date().toISOString(),
+                project: POLANCO_CONFIG.projectId,
+                school: POLANCO_CONFIG.expectedSchool,
+                summary: { errors, warnings, successes },
+                results: testResults
+            };
+
+            addResult('📋 Reporte Final', JSON.stringify(report, null, 2), finalType);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testResults = [];
+            updateStatus('✨ Resultados limpiados', 'success');
+        }
+
+        // Ejecutar prueba automática al cargar la página
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                updateStatus('🏫 Sistema Instituto Polanco - Listo para pruebas', 'success');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

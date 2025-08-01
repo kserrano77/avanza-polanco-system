@@ -1,0 +1,18 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  VITE_SUPABASE_URL = "https://gvrgepdjxzhgqkmtwcvs.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cmdlcGRqeHpoZ3FrbXR3Y3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1NzQ0NjIsImV4cCI6MjA1MDE1MDQ2Mn0.Oy_Nt9Xd8_Nt9Xd8_Nt9Xd8_Nt9Xd8_Nt9Xd8_Nt9Xd8"
+  VITE_SCHOOL_NAME = "Avanza Cd Obregón"
+  VITE_SCHOOL_CODE = "AVANZA_CDOBREGON_2"
+  RESEND_API_KEY = "re_123456789"

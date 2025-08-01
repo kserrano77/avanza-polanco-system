@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Cd. Obregón - Verificación Final</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .status { background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 10px 0; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Final - Cd. Obregón</h1>
+    <div class="status">
+        <h3>🔧 Estado de Conexión:</h3>
+        <div id="connection-status">Verificando...</div>
+    </div>
+    
+    <div class="status">
+        <h3>🎯 Acciones de Prueba:</h3>
+        <button onclick="testConnection()">🔍 Probar Conexión</button>
+        <button onclick="createTestPayment()">💰 Crear Pago de Prueba</button>
+        <button onclick="listRecentPayments()">📋 Ver Pagos Recientes</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        // CREDENCIALES HARDCODEADAS PARA CD. OBREGÓN
+        const supabaseUrl = 'https://gvrgepdjxzhgqkmtwcvs.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cmdlcGRqeHpoZ3FrbXR3Y3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NzQ2MDgsImV4cCI6MjA2OTA1MDYwOH0.AIWP8QtduUJhR4xweB8T0RrcWpDBqAke0saJbCk6R2o';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        console.log('🔧 CLIENTE SUPABASE INICIALIZADO (CD. OBREGÓN - HARDCODED):');
+        console.log('URL:', supabaseUrl);
+        console.log('✅ FORZADO: Usando proyecto de Cd. Obregón');
+        console.log('🎯 PROYECTO ID: gvrgepdjxzhgqkmtwcvs');
+        
+        // Mostrar estado inicial
+        document.getElementById('connection-status').innerHTML = `
+            <p><strong>🌐 URL:</strong> ${supabaseUrl}</p>
+            <p><strong>🔑 Proyecto:</strong> gvrgepdjxzhgqkmtwcvs</p>
+            <p><strong>✅ Estado:</strong> Conectado a Cd. Obregón (HARDCODED)</p>
+            <p><strong>🎯 Objetivo:</strong> Verificar que los datos NO aparezcan en Polanco</p>
+        `;
+
+        async function testConnection() {
+            try {
+                const { data, error } = await supabase.from('students').select('id, name').limit(3);
+                if (error) throw error;
+                
+                document.getElementById('results').innerHTML = `
+                    <div class="success">
+                        <h3>✅ Conexión Exitosa a Cd. Obregón</h3>
+                        <p><strong>Proyecto:</strong> gvrgepdjxzhgqkmtwcvs</p>
+                        <p><strong>Estudiantes encontrados:</strong> ${data.length}</p>
+                        <p><strong>Primeros estudiantes:</strong></p>
+                        <ul>${data.map(s => `<li>ID: ${s.id} - ${s.name}</li>`).join('')}</ul>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error de Conexión</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function createTestPayment() {
+            const timestamp = new Date().toLocaleString('es-MX');
+            try {
+                // Usar ID de estudiante hardcodeado (típicamente 1 es el primer estudiante)
+                const testPayment = {
+                    student_id: 1, // ID hardcodeado
+                    amount: 999,
+                    concept: `🧪 TEST FINAL CD OBREGÓN - ${timestamp}`,
+                    paid_date: new Date().toISOString().split('T')[0],
+                    status: 'paid'
+                };
+
+                const { data, error } = await supabase
+                    .from('payments')
+                    .insert([testPayment])
+                    .select();
+
+                if (error) throw error;
+
+                document.getElementById('results').innerHTML = `
+                    <div class="success">
+                        <h3>🎉 ¡PAGO CREADO EXITOSAMENTE EN CD. OBREGÓN!</h3>
+                        <p><strong>🆔 ID del Pago:</strong> ${data[0].id}</p>
+                        <p><strong>💰 Concepto:</strong> ${data[0].concept}</p>
+                        <p><strong>💵 Monto:</strong> $${data[0].amount}</p>
+                        <p><strong>📅 Fecha:</strong> ${data[0].paid_date}</p>
+                        <p><strong>🏢 Proyecto:</strong> gvrgepdjxzhgqkmtwcvs (Cd. Obregón)</p>
+                        <hr>
+                        <p><strong>🎯 AHORA VERIFICA:</strong></p>
+                        <p>1. Ve a: <a href="https://avanzasystempolanco.cloud" target="_blank">https://avanzasystempolanco.cloud</a></p>
+                        <p>2. Busca en "Pagos" el concepto: "${data[0].concept}"</p>
+                        <p>3. <strong>NO debe aparecer</strong> en Polanco si la separación funciona</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error al Crear Pago</h3>
+                        <p>${error.message}</p>
+                        <p><em>Nota: Si es error RLS, significa que la conexión es correcta pero necesitas autenticación</em></p>
+                    </div>
+                `;
+            }
+        }
+
+        async function listRecentPayments() {
+            try {
+                const { data, error } = await supabase
+                    .from('payments')
+                    .select('id, concept, amount, paid_date')
+                    .order('id', { ascending: false })
+                    .limit(5);
+                
+                if (error) throw error;
+
+                document.getElementById('results').innerHTML = `
+                    <div class="success">
+                        <h3>📋 Últimos 5 Pagos en Cd. Obregón</h3>
+                        <p><strong>Proyecto:</strong> gvrgepdjxzhgqkmtwcvs</p>
+                        ${data.length === 0 ? '<p>No hay pagos registrados</p>' : 
+                          '<ul>' + data.map(p => 
+                            `<li><strong>ID:</strong> ${p.id} - <strong>$${p.amount}</strong> - ${p.concept} (${p.paid_date})</li>`
+                          ).join('') + '</ul>'
+                        }
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error al Listar Pagos</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-test al cargar
+        setTimeout(testConnection, 1000);
+    </script>
+</body>
+</html>

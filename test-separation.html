@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Separación - Cd. Obregón</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>🧪 Test de Separación - Cd. Obregón</h1>
+    <div id="status"></div>
+    <button onclick="testConnection()">Probar Conexión</button>
+    <button onclick="createTestPayment()">Crear Pago de Prueba</button>
+    <div id="results"></div>
+
+    <script>
+        // CREDENCIALES HARDCODEADAS PARA CD. OBREGÓN
+        const supabaseUrl = 'https://gvrgepdjxzhgqkmtwcvs.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cmdlcGRqeHpoZ3FrbXR3Y3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NzQ2MDgsImV4cCI6MjA2OTA1MDYwOH0.AIWP8QtduUJhR4xweB8T0RrcWpDBqAke0saJbCk6R2o';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        console.log('🔧 CLIENTE SUPABASE INICIALIZADO (HARDCODED):');
+        console.log('URL:', supabaseUrl);
+        console.log('✅ FORZADO: Usando proyecto de Cd. Obregón');
+        
+        document.getElementById('status').innerHTML = `
+            <p><strong>URL:</strong> ${supabaseUrl}</p>
+            <p><strong>Status:</strong> ✅ Conectado a Cd. Obregón (HARDCODED)</p>
+        `;
+
+        async function testConnection() {
+            try {
+                const { data, error } = await supabase.from('students').select('count').limit(1);
+                if (error) throw error;
+                
+                document.getElementById('results').innerHTML = `
+                    <p>✅ Conexión exitosa a Cd. Obregón</p>
+                    <p>Proyecto: gvrgepdjxzhgqkmtwcvs</p>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <p>❌ Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function createTestPayment() {
+            try {
+                const testPayment = {
+                    student_id: 1,
+                    amount: 100,
+                    concept: 'TEST SEPARACIÓN CD OBREGÓN',
+                    paid_date: new Date().toISOString().split('T')[0],
+                    status: 'paid'
+                };
+
+                const { data, error } = await supabase
+                    .from('payments')
+                    .insert([testPayment])
+                    .select();
+
+                if (error) throw error;
+
+                document.getElementById('results').innerHTML = `
+                    <p>✅ Pago creado exitosamente en Cd. Obregón</p>
+                    <p><strong>ID:</strong> ${data[0].id}</p>
+                    <p><strong>Concepto:</strong> ${data[0].concept}</p>
+                    <p><strong>Proyecto:</strong> gvrgepdjxzhgqkmtwcvs</p>
+                    <p>🎯 <strong>Ahora verifica que NO aparezca en Polanco</strong></p>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <p>❌ Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
