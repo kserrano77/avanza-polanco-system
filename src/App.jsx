@@ -181,6 +181,12 @@ function App() {
         supabase.from('schedules').select('*, courses(name)').order('day_of_week').order('start_time')
       ]);
 
+      // Debug: verificar resultados de las consultas
+      console.log('🔍 Debug - studentsRes:', studentsRes);
+      console.log('🔍 Debug - studentsRes.error:', studentsRes.error);
+      console.log('🔍 Debug - studentsRes.data:', studentsRes.data);
+      console.log('🔍 Debug - studentsRes.data length:', studentsRes.data?.length);
+      
       // Manejar errores de manera más robusta - usar arrays vacíos en lugar de fallar
       setStudents(studentsRes.error ? [] : (studentsRes.data || []));
       setPayments(paymentsRes.error ? [] : (paymentsRes.data || []));
@@ -188,7 +194,12 @@ function App() {
       setSchedules(schedulesRes.error ? [] : (schedulesRes.data || []));
       
       // Solo logear errores, no fallar
-      if (studentsRes.error) console.warn('Error cargando estudiantes:', studentsRes.error);
+      if (studentsRes.error) {
+        console.error('❌ ERROR cargando estudiantes:', studentsRes.error);
+        console.error('❌ Detalles del error:', studentsRes.error.message, studentsRes.error.details);
+      } else {
+        console.log('✅ Estudiantes cargados exitosamente:', studentsRes.data?.length, 'estudiantes');
+      }
       if (paymentsRes.error) console.warn('Error cargando pagos:', paymentsRes.error);
       if (coursesRes.error) console.warn('Error cargando cursos:', coursesRes.error);
       if (schedulesRes.error) console.warn('Error cargando horarios:', schedulesRes.error);
