@@ -124,19 +124,21 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Crear objeto con solo las columnas que existen en la tabla payments
+    // Crear objeto ultra-simplificado con solo campos básicos
     const dataToSave = {
-      student_id: formData.student_id,
+      student_id: parseInt(formData.student_id),
       amount: parseFloat(formData.amount),
-      concept: formData.concept,
-      status: formData.status,
-      payment_date: formData.payment_date,
-      paid_date: formData.status === 'paid' ? (payment?.paid_date || getLocalDateString()) : null
+      concept: formData.concept || 'Pago',
+      status: formData.status || 'pending'
     };
     
-    // Solo agregar created_at si es un pago nuevo
-    if (!payment) {
-      dataToSave.created_at = new Date().toISOString();
+    // Solo agregar campos opcionales si no están vacíos
+    if (formData.payment_date) {
+      dataToSave.payment_date = formData.payment_date;
+    }
+    
+    if (formData.status === 'paid') {
+      dataToSave.paid_date = payment?.paid_date || getLocalDateString();
     }
     
     try {
