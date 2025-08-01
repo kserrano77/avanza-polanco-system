@@ -165,7 +165,7 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
     
     // Crear objeto ultra-simplificado con solo campos básicos
     const dataToSave = {
-      student_id: parseInt(formData.student_id),
+      student_id: formData.student_id, // UUID string, no convertir a int
       amount: parseFloat(formData.amount),
       concept: formData.concept || 'Pago',
       status: formData.status || 'pending'
