@@ -70,6 +70,14 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
     );
     
     console.log('🔍 Debug - estudiante encontrado FINAL:', student);
+    console.log('🔍 Debug - ESTRUCTURA COMPLETA del estudiante:', {
+      id: student?.id,
+      name: student?.name,
+      first_name: student?.first_name,
+      last_name: student?.last_name,
+      email: student?.email,
+      todas_las_propiedades: Object.keys(student || {})
+    });
     
     if (!student) {
       toast({ variant: "destructive", title: "No se pudo enviar el recibo", description: "Estudiante no encontrado en la lista." });
