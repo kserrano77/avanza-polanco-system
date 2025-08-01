@@ -51,9 +51,26 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
   }, [payment, open]);
 
   const sendPaymentReceipt = async (paymentData) => {
-    const student = students.find(s => s.id === paymentData.student_id);
-    if (!student || !student.email) {
-      toast({ variant: "destructive", title: "No se pudo enviar el recibo", description: "El estudiante no tiene un email registrado." });
+    // Debug: verificar datos de búsqueda
+    console.log('🔍 Debug - paymentData.student_id:', paymentData.student_id, 'tipo:', typeof paymentData.student_id);
+    console.log('🔍 Debug - students disponibles:', students.map(s => ({ id: s.id, name: s.name, email: s.email })));
+    
+    // Buscar estudiante con conversión de tipos para evitar problemas
+    const student = students.find(s => 
+      s.id == paymentData.student_id || 
+      s.id === parseInt(paymentData.student_id) || 
+      parseInt(s.id) === parseInt(paymentData.student_id)
+    );
+    
+    console.log('🔍 Debug - estudiante encontrado:', student);
+    
+    if (!student) {
+      toast({ variant: "destructive", title: "No se pudo enviar el recibo", description: "Estudiante no encontrado en la lista." });
+      return;
+    }
+    
+    if (!student.email) {
+      toast({ variant: "destructive", title: "No se pudo enviar el recibo", description: `El estudiante ${student.name} no tiene un email registrado.` });
       return;
     }
     
