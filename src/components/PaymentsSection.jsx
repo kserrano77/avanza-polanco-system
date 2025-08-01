@@ -124,16 +124,20 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
     e.preventDefault();
     setIsSubmitting(true);
     
-    const dataToSave = { 
-      ...formData, 
+    // Crear objeto con solo las columnas que existen en la tabla payments
+    const dataToSave = {
+      student_id: formData.student_id,
       amount: parseFloat(formData.amount),
-      created_at: payment?.created_at || new Date().toISOString(),
+      concept: formData.concept,
+      status: formData.status,
+      payment_date: formData.payment_date,
       paid_date: formData.status === 'paid' ? (payment?.paid_date || getLocalDateString()) : null
     };
     
-    // Remove columns that don't exist in the payments table
-    delete dataToSave.debt_amount;
-    delete dataToSave.debt_description;
+    // Solo agregar created_at si es un pago nuevo
+    if (!payment) {
+      dataToSave.created_at = new Date().toISOString();
+    }
     
     try {
       let savedPayment;
