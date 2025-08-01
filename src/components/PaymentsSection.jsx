@@ -28,7 +28,7 @@ const getLocalDateString = () => {
 };
 
 const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
-  const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', debt_amount: '', debt_description: '' });
+  const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', due_date: '', debt_amount: '', debt_description: '' });
   const [sendReceipt, setSendReceipt] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -40,11 +40,12 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
         amount: payment.amount || '', 
         concept: payment.concept || '', 
         status: payment.status || 'pending',
+        due_date: payment.due_date || '',
         debt_amount: payment.debt_amount || '',
         debt_description: payment.debt_description || ''
       });
     } else {
-      setFormData({ student_id: '', amount: '', concept: '', status: 'pending', debt_amount: '', debt_description: '' });
+      setFormData({ student_id: '', amount: '', concept: '', status: 'pending', due_date: '', debt_amount: '', debt_description: '' });
     }
   }, [payment, open]);
 
@@ -188,6 +189,7 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
           </div>
           <div><Label htmlFor="amount" className="text-white/80">Monto Pagado</Label><Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} className="input-field" required /></div>
           <div><Label htmlFor="concept" className="text-white/80">Concepto</Label><Input id="concept" value={formData.concept} onChange={(e) => setFormData(prev => ({ ...prev, concept: e.target.value }))} className="input-field" placeholder="Ej: Mensualidad Enero 2024" required /></div>
+          <div><Label htmlFor="due_date" className="text-white/80">Fecha de Vencimiento</Label><Input id="due_date" type="date" value={formData.due_date} onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))} className="input-field" /></div>
           
           {/* Sección de Adeudo */}
           <div className="border-t border-white/20 pt-4 mt-4">
