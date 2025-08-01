@@ -52,17 +52,24 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
 
   const sendPaymentReceipt = async (paymentData) => {
     // Debug: verificar datos de búsqueda
+    console.log('🔍 Debug - paymentData completo:', paymentData);
     console.log('🔍 Debug - paymentData.student_id:', paymentData.student_id, 'tipo:', typeof paymentData.student_id);
-    console.log('🔍 Debug - students disponibles:', students.map(s => ({ id: s.id, name: s.name, email: s.email })));
+    console.log('🔍 Debug - students array length:', students.length);
+    console.log('🔍 Debug - students disponibles:', students.map(s => ({ id: s.id, tipo_id: typeof s.id, name: s.name, email: s.email })));
     
     // Buscar estudiante con conversión de tipos para evitar problemas
+    console.log('🔍 Intentando búsquedas:');
+    console.log('🔍 Búsqueda 1 (==):', students.find(s => s.id == paymentData.student_id));
+    console.log('🔍 Búsqueda 2 (parseInt):', students.find(s => s.id === parseInt(paymentData.student_id)));
+    console.log('🔍 Búsqueda 3 (ambos parseInt):', students.find(s => parseInt(s.id) === parseInt(paymentData.student_id)));
+    
     const student = students.find(s => 
       s.id == paymentData.student_id || 
       s.id === parseInt(paymentData.student_id) || 
       parseInt(s.id) === parseInt(paymentData.student_id)
     );
     
-    console.log('🔍 Debug - estudiante encontrado:', student);
+    console.log('🔍 Debug - estudiante encontrado FINAL:', student);
     
     if (!student) {
       toast({ variant: "destructive", title: "No se pudo enviar el recibo", description: "Estudiante no encontrado en la lista." });
