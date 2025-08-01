@@ -215,7 +215,20 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
 
       // Enviar recibo si el pago está marcado como pagado
       if (sendReceipt && savedPayment.status === 'paid') {
-        await sendPaymentReceipt(savedPayment);
+        // 📧 Crear objeto de pago con datos de adeudo TEMPORALES (solo para el comprobante)
+        const paymentForReceipt = {
+          ...savedPayment,
+          // 💰 Agregar campos de adeudo del formulario (NO se guardan en BD)
+          debt_amount: formData.debt_amount ? parseFloat(formData.debt_amount) : 0,
+          debt_description: formData.debt_description || null
+        };
+        
+        console.log('📧 Debug - Enviando comprobante con adeudo:', {
+          debt_amount: paymentForReceipt.debt_amount,
+          debt_description: paymentForReceipt.debt_description
+        });
+        
+        await sendPaymentReceipt(paymentForReceipt);
       }
 
       // Enviar confirmación de nuevo pago registrado (solo para pagos nuevos y pendientes)
