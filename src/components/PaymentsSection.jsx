@@ -148,6 +148,21 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Validar que se haya seleccionado un estudiante
+    if (!formData.student_id) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error de validación", 
+        description: "Debes seleccionar un estudiante para registrar el pago." 
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Debug: verificar datos antes de guardar
+    console.log('🔍 Debug - formData antes de guardar:', formData);
+    console.log('🔍 Debug - formData.student_id:', formData.student_id, 'tipo:', typeof formData.student_id);
+    
     // Crear objeto ultra-simplificado con solo campos básicos
     const dataToSave = {
       student_id: parseInt(formData.student_id),
@@ -155,6 +170,8 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
       concept: formData.concept || 'Pago',
       status: formData.status || 'pending'
     };
+    
+    console.log('🔍 Debug - dataToSave:', dataToSave);
     
     // Solo agregar campos opcionales si no están vacíos
     if (formData.payment_date) {
