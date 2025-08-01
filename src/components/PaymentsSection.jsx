@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useRolePermissions } from '@/hooks/useRolePermissions';
 import MonthlyBlocksContainer from './payments/MonthlyBlocksContainer';
 import PaymentsDashboard from './payments/PaymentsDashboard';
+import emailNotificationService from '@/services/emailNotificationService';
 
 const getLocalDateString = () => {
     const date = new Date();
@@ -27,8 +28,8 @@ const getLocalDateString = () => {
     return `${year}-${month}-${day}`;
 };
 
-const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
-  const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', due_date: '', debt_amount: '', debt_description: '' });
+const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSettings }) => {
+  const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', payment_date: '', debt_amount: '', debt_description: '' });
   const [sendReceipt, setSendReceipt] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -40,12 +41,12 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
         amount: payment.amount || '', 
         concept: payment.concept || '', 
         status: payment.status || 'pending',
-        due_date: payment.due_date || '',
+        payment_date: payment.payment_date || '',
         debt_amount: payment.debt_amount || '',
         debt_description: payment.debt_description || ''
       });
     } else {
-      setFormData({ student_id: '', amount: '', concept: '', status: 'pending', due_date: '', debt_amount: '', debt_description: '' });
+      setFormData({ student_id: '', amount: '', concept: '', status: 'pending', payment_date: '', debt_amount: '', debt_description: '' });
     }
   }, [payment, open]);
 
@@ -132,7 +133,7 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
     
     // Remove columns that don't exist in the payments table
     delete dataToSave.debt_amount;
-    // due_date no existe en la tabla payments - eliminado
+    delete dataToSave.debt_description;
     
     try {
       let savedPayment;
@@ -151,8 +152,37 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
         description: `El pago se ha ${payment ? 'actualizado' : 'guardado'} correctamente.`,
       });
 
+      // Enviar recibo si el pago está marcado como pagado
       if (sendReceipt && savedPayment.status === 'paid') {
         await sendPaymentReceipt(savedPayment);
+      }
+
+      // Enviar confirmación de nuevo pago registrado (solo para pagos nuevos y pendientes)
+      if (!payment && savedPayment.status === 'pending') {
+        try {
+          const student = students.find(s => s.id === savedPayment.student_id);
+          if (student && student.email) {
+            await emailNotificationService.sendPaymentConfirmation(student, savedPayment, schoolSettings);
+            
+            // Marcar confirmación como enviada
+            await supabase
+              .from('payments')
+              .update({ confirmation_sent: new Date().toISOString() })
+              .eq('id', savedPayment.id);
+              
+            toast({
+              title: "Confirmación enviada",
+              description: `Se ha enviado una confirmación a ${student.email}.`,
+            });
+          }
+        } catch (error) {
+          console.error('Error enviando confirmación:', error);
+          toast({
+            variant: "destructive",
+            title: "Error al enviar confirmación",
+            description: "El pago se registró correctamente, pero no se pudo enviar la confirmación por email.",
+          });
+        }
       }
 
       refreshData();
@@ -189,7 +219,7 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
           </div>
           <div><Label htmlFor="amount" className="text-white/80">Monto Pagado</Label><Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} className="input-field" required /></div>
           <div><Label htmlFor="concept" className="text-white/80">Concepto</Label><Input id="concept" value={formData.concept} onChange={(e) => setFormData(prev => ({ ...prev, concept: e.target.value }))} className="input-field" placeholder="Ej: Mensualidad Enero 2024" required /></div>
-          <div><Label htmlFor="due_date" className="text-white/80">Fecha de Vencimiento</Label><Input id="due_date" type="date" value={formData.due_date} onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))} className="input-field" /></div>
+          <div><Label htmlFor="payment_date" className="text-white/80">Fecha de Vencimiento</Label><Input id="payment_date" type="date" value={formData.payment_date} onChange={(e) => setFormData(prev => ({ ...prev, payment_date: e.target.value }))} className="input-field" /></div>
           
           {/* Sección de Adeudo */}
           <div className="border-t border-white/20 pt-4 mt-4">
@@ -256,7 +286,7 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData }) => {
   );
 };
 
-const PaymentsSection = ({ payments, students, refreshData }) => {
+const PaymentsSection = ({ payments, students, refreshData, schoolSettings }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
   const [viewMode, setViewMode] = useState('blocks'); // 'blocks' o 'dashboard'
@@ -551,6 +581,7 @@ const PaymentsSection = ({ payments, students, refreshData }) => {
         payment={editingPayment} 
         students={students} 
         refreshData={refreshData} 
+        schoolSettings={schoolSettings}
       />
     </div>
   );

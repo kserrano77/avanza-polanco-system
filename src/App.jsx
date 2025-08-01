@@ -24,6 +24,7 @@ import Login from '@/components/Login';
 import { Loader2 } from 'lucide-react';
 import PlaceholderSection from '@/components/PlaceholderSection';
 import AuditLogSection from '@/components/AuditLogSection';
+import NotificationManager from '@/components/NotificationManager';
 
 const backgroundThemes = {
   default: { from: '#1e1b4b', via: '#4c1d95', to: '#0f172a' },
@@ -247,7 +248,7 @@ function App() {
       case 'students':
         return <StudentsSection students={students} courses={courses} schedules={schedules} refreshData={fetchProfileAndData} />;
       case 'payments':
-        return <PaymentsSection payments={payments} students={activeStudents} refreshData={fetchProfileAndData} />;
+        return <PaymentsSection payments={payments} students={activeStudents} refreshData={fetchProfileAndData} schoolSettings={schoolSettings} />;
       case 'accountStatement':
         return <AccountStatementSection students={students} schoolSettings={schoolSettings} />;
       case 'cashCut':
@@ -353,6 +354,9 @@ function App() {
             {renderSection()}
           </motion.div>
         </main>
+        
+        {/* Gestor de notificaciones automáticas */}
+        <NotificationManager schoolSettings={schoolSettings} />
         
         <Toaster />
       </div>
