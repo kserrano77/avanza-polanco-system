@@ -317,6 +317,14 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
 };
 
 const PaymentsSection = ({ payments, students, refreshData, schoolSettings }) => {
+  // Debug: verificar cuándo llegan los estudiantes como prop
+  console.log('🔍 PaymentsSection - students prop:', students);
+  console.log('🔍 PaymentsSection - students length:', students?.length);
+  
+  useEffect(() => {
+    console.log('🔍 PaymentsSection useEffect - students cambiaron:', students?.length, 'estudiantes');
+    console.log('🔍 PaymentsSection useEffect - estudiantes:', students?.map(s => ({ id: s.id, name: s.name || s.first_name, email: s.email })));
+  }, [students]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
   const [viewMode, setViewMode] = useState('blocks'); // 'blocks' o 'dashboard'
