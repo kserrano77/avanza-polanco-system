@@ -270,57 +270,71 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="glass-effect border-white/20 text-white">
+      <DialogContent className="bg-slate-800/95 backdrop-blur-md border-slate-600/30 text-white shadow-2xl max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="gradient-text">{payment ? 'Editar Pago' : 'Registrar Nuevo Pago'}</DialogTitle>
-          <DialogDescription className="text-white/60">{payment ? 'Actualiza los detalles del pago.' : 'Completa los campos para registrar un nuevo pago.'}</DialogDescription>
+          <DialogTitle className="text-white text-xl font-semibold">{payment ? 'Editar Pago' : 'Registrar Nuevo Pago'}</DialogTitle>
+          <DialogDescription className="text-slate-300">{payment ? 'Actualiza los detalles del pago.' : 'Completa los campos para registrar un nuevo pago.'}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="student_id" className="text-white/80">Estudiante</Label>
+            <Label htmlFor="student_id" className="text-slate-200 font-medium mb-2 block">Estudiante</Label>
             <Select value={formData.student_id?.toString() || ''} onValueChange={(value) => setFormData(prev => ({ ...prev, student_id: value }))}>
-              <SelectTrigger className="input-field">
-                <SelectValue placeholder="Seleccionar estudiante" />
+              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                <SelectValue placeholder="Seleccionar estudiante">
+                  {formData.student_id ? 
+                    students.find(s => String(s.id) === String(formData.student_id))?.first_name + ' ' + students.find(s => String(s.id) === String(formData.student_id))?.last_name || 'Estudiante seleccionado'
+                    : 'Seleccionar estudiante'
+                  }
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-slate-800 border-slate-600">
                 {students.map(student => (
-                  <SelectItem key={student.id} value={student.id.toString()}>
+                  <SelectItem key={student.id} value={student.id.toString()} className="text-white hover:bg-slate-700 focus:bg-slate-700">
                     {`${student.first_name} ${student.last_name}`}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div><Label htmlFor="amount" className="text-white/80">Monto Pagado</Label><Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} className="input-field" required /></div>
-          <div><Label htmlFor="concept" className="text-white/80">Concepto</Label><Input id="concept" value={formData.concept} onChange={(e) => setFormData(prev => ({ ...prev, concept: e.target.value }))} className="input-field" placeholder="Ej: Mensualidad Enero 2024" required /></div>
-          <div><Label htmlFor="payment_date" className="text-white/80">Fecha de Vencimiento</Label><Input id="payment_date" type="date" value={formData.payment_date} onChange={(e) => setFormData(prev => ({ ...prev, payment_date: e.target.value }))} className="input-field" /></div>
+          <div>
+            <Label htmlFor="amount" className="text-slate-200 font-medium mb-2 block">Monto Pagado</Label>
+            <Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+          </div>
+          <div>
+            <Label htmlFor="concept" className="text-slate-200 font-medium mb-2 block">Concepto</Label>
+            <Input id="concept" value={formData.concept} onChange={(e) => setFormData(prev => ({ ...prev, concept: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" placeholder="Ej: Mensualidad Enero 2024" required />
+          </div>
+          <div>
+            <Label htmlFor="payment_date" className="text-slate-200 font-medium mb-2 block">Fecha de Vencimiento</Label>
+            <Input id="payment_date" type="date" value={formData.payment_date} onChange={(e) => setFormData(prev => ({ ...prev, payment_date: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
+          </div>
           
           {/* Sección de Adeudo */}
-          <div className="border-t border-white/20 pt-4 mt-4">
-            <h4 className="text-white/90 font-medium mb-3 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
+          <div className="border-t border-slate-600/30 pt-4 mt-4">
+            <h4 className="text-slate-200 font-medium mb-3 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-yellow-400" />
               Información de Adeudo (Opcional)
             </h4>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="debt_amount" className="text-white/80">Monto de Adeudo</Label>
+                <Label htmlFor="debt_amount" className="text-slate-200 font-medium mb-2 block">Monto de Adeudo</Label>
                 <Input 
                   id="debt_amount" 
                   type="number" 
                   step="0.01" 
                   value={formData.debt_amount} 
                   onChange={(e) => setFormData(prev => ({ ...prev, debt_amount: e.target.value }))} 
-                  className="input-field" 
+                  className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" 
                   placeholder="0.00" 
                 />
               </div>
               <div>
-                <Label htmlFor="debt_description" className="text-white/80">Concepto del Adeudo</Label>
+                <Label htmlFor="debt_description" className="text-slate-200 font-medium mb-2 block">Concepto del Adeudo</Label>
                 <Input 
                   id="debt_description" 
                   value={formData.debt_description} 
                   onChange={(e) => setFormData(prev => ({ ...prev, debt_description: e.target.value }))} 
-                  className="input-field" 
+                  className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" 
                   placeholder="Ej: Mensualidad pendiente de Diciembre 2023" 
                 />
               </div>
@@ -328,28 +342,39 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
           </div>
 
           <div>
-            <Label htmlFor="status" className="text-white/80">Estado</Label>
+            <Label htmlFor="status" className="text-slate-200 font-medium mb-2 block">Estado</Label>
             <Select onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))} value={formData.status}>
-              <SelectTrigger className="input-field"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pendiente</SelectItem>
-                <SelectItem value="paid">Pagado</SelectItem>
-                <SelectItem value="overdue">Vencido</SelectItem>
+              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                <SelectValue>
+                  {formData.status === 'pending' ? 'Pendiente' : 
+                   formData.status === 'paid' ? 'Pagado' : 
+                   formData.status === 'overdue' ? 'Vencido' : 'Seleccionar estado'
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectItem value="pending" className="text-white hover:bg-slate-700 focus:bg-slate-700">Pendiente</SelectItem>
+                <SelectItem value="paid" className="text-white hover:bg-slate-700 focus:bg-slate-700">Pagado</SelectItem>
+                <SelectItem value="overdue" className="text-white hover:bg-slate-700 focus:bg-slate-700">Vencido</SelectItem>
               </SelectContent>
             </Select>
           </div>
           {formData.status === 'paid' && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-white/10">
-              <Label htmlFor="send-receipt" className="flex items-center gap-2 text-white/90">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-700/30 border border-slate-600/30">
+              <Label htmlFor="send-receipt" className="flex items-center gap-2 text-slate-200">
                 <Send className="w-4 h-4" />
                 Enviar comprobante por email
               </Label>
               <Switch id="send-receipt" checked={sendReceipt} onCheckedChange={setSendReceipt} />
             </div>
           )}
-          <DialogFooter>
-            <DialogClose asChild><Button type="button" variant="secondary" className="btn-secondary">Cancelar</Button></DialogClose>
-            <Button type="submit" className="w-full btn-primary" disabled={isSubmitting}>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" className="bg-slate-600 hover:bg-slate-500 text-white border-slate-500">
+                Cancelar
+              </Button>
+            </DialogClose>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white flex-1" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {payment ? 'Actualizar Pago' : 'Registrar Pago'}
             </Button>

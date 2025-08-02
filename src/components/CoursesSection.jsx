@@ -63,26 +63,28 @@ const CourseDialog = ({ isOpen, setIsOpen, course, onSave, loading }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="glass-effect border-purple-500">
+      <DialogContent className="bg-slate-800/95 backdrop-blur-md border-slate-600/30 text-white shadow-2xl max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="gradient-text">{course ? 'Editar Curso' : 'Nuevo Curso'}</DialogTitle>
-          <DialogDescription className="text-white/60">
+          <DialogTitle className="text-white text-xl font-semibold">{course ? 'Editar Curso' : 'Nuevo Curso'}</DialogTitle>
+          <DialogDescription className="text-slate-300">
             {course ? 'Actualiza la información del curso.' : 'Añade un nuevo curso a tu escuela.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name" className="text-white/80">Nombre del Curso</Label>
-            <Input id="name" value={formData.name} onChange={handleChange} required className="input-glass" />
+            <Label htmlFor="name" className="text-slate-200 font-medium mb-2 block">Nombre del Curso</Label>
+            <Input id="name" value={formData.name} onChange={handleChange} required className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
           </div>
 
           <div>
-            <Label htmlFor="description" className="text-white/80">Descripción</Label>
-            <Textarea id="description" value={formData.description} onChange={handleChange} className="input-glass" />
+            <Label htmlFor="description" className="text-slate-200 font-medium mb-2 block">Descripción</Label>
+            <Textarea id="description" value={formData.description} onChange={handleChange} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 min-h-[80px] resize-none" />
           </div>
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setIsOpen(false)}>Cancelar</Button>
-            <Button type="submit" className="btn-primary" disabled={loading}>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="secondary" className="bg-slate-600 hover:bg-slate-500 text-white border-slate-500" onClick={() => setIsOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white flex-1" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Guardar
             </Button>

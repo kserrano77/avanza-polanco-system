@@ -92,19 +92,19 @@ const CreateUserDialog = ({ open, setOpen, refreshUsers }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="bg-slate-800/95 backdrop-blur-md border-slate-600/30 text-white shadow-2xl max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="text-white text-xl font-semibold flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
             Crear Usuario
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-slate-300">
             Crea un nuevo usuario que podrá acceder inmediatamente al sistema.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="fullName" className="text-white/80">
+            <Label htmlFor="fullName" className="text-slate-200 font-medium mb-2 block">
               Nombre Completo
             </Label>
             <Input
@@ -112,12 +112,12 @@ const CreateUserDialog = ({ open, setOpen, refreshUsers }) => {
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="input-field"
+              className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20"
               required
             />
           </div>
           <div>
-            <Label htmlFor="email" className="text-white/80">
+            <Label htmlFor="email" className="text-slate-200 font-medium mb-2 block">
               Email del Usuario
             </Label>
             <Input
@@ -125,40 +125,43 @@ const CreateUserDialog = ({ open, setOpen, refreshUsers }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
+              className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20"
               required
             />
           </div>
           <div>
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password" className="text-slate-200 font-medium mb-2 block">Contraseña</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Contraseña para el usuario"
+              className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role">Rol</Label>
+            <Label htmlFor="role" className="text-slate-200 font-medium mb-2 block">Rol</Label>
             <Select value={role} onValueChange={setRole}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar rol" />
+              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                <SelectValue placeholder="Seleccionar rol">
+                  {role === 'admin' ? 'Administrador' : role === 'receptionist' ? 'Recepcionista' : 'Seleccionar rol'}
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Administrador</SelectItem>
-                <SelectItem value="receptionist">Recepcionista</SelectItem>
+              <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectItem value="admin" className="text-white hover:bg-slate-700 focus:bg-slate-700">Administrador</SelectItem>
+                <SelectItem value="receptionist" className="text-white hover:bg-slate-700 focus:bg-slate-700">Recepcionista</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <DialogClose asChild>
-              <Button type="button" variant="secondary" className="btn-secondary">
+              <Button type="button" variant="secondary" className="bg-slate-600 hover:bg-slate-500 text-white border-slate-500">
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isSubmitting || !email || !fullName || !password}>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white flex-1" disabled={isSubmitting || !email || !fullName || !password}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

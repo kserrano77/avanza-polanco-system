@@ -119,54 +119,113 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="glass-effect border-white/20 text-white">
-        <DialogHeader className="modal-header">
-          <DialogTitle className="modal-title">{student ? 'Editar Estudiante' : 'Nuevo Estudiante'}</DialogTitle>
-          <DialogDescription className="modal-description">
+      <DialogContent className="bg-slate-800/95 backdrop-blur-md border-slate-600/30 text-white shadow-2xl max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-white text-xl font-semibold">{student ? 'Editar Estudiante' : 'Nuevo Estudiante'}</DialogTitle>
+          <DialogDescription className="text-slate-300">
             {student ? 'Actualiza los datos del estudiante.' : 'Completa los campos para registrar un nuevo estudiante.'}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="modal-form-content space-y-4">
-          <div><Label htmlFor="first_name" className="text-white/80">Nombre</Label><Input id="first_name" value={formData.first_name || ''} onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))} className="input-field" required /></div>
-          <div><Label htmlFor="last_name" className="text-white/80">Apellido</Label><Input id="last_name" value={formData.last_name || ''} onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))} className="input-field" required /></div>
-          <div><Label htmlFor="student_number" className="text-white/80">Número de Estudiante</Label><Input id="student_number" value={formData.student_number || ''} onChange={(e) => setFormData(prev => ({ ...prev, student_number: e.target.value }))} className="input-field" required /></div>
-          <div><Label htmlFor="email" className="text-white/80">Email</Label><Input id="email" type="email" value={formData.email || ''} onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))} className="input-field" required /></div>
-          <div><Label htmlFor="phone" className="text-white/80">Teléfono</Label><Input id="phone" value={formData.phone || ''} onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))} className="input-field" /></div>
-          <div><Label htmlFor="address" className="text-white/80">Dirección</Label><Input id="address" value={formData.address || ''} onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))} className="input-field" required /></div>
-          <div><Label htmlFor="birth_date" className="text-white/80">Fecha de Nacimiento</Label><Input id="birth_date" type="date" value={formData.birth_date || ''} onChange={(e) => setFormData(prev => ({ ...prev, birth_date: e.target.value }))} className="input-field" required /></div>
-          <div>
-            <Label htmlFor="course_id" className="text-white/80">Curso</Label>
-            <Select onValueChange={(value) => setFormData(prev => ({ ...prev, course_id: value === 'none' ? null : value }))} value={formData.course_id || 'none'}>
-              <SelectTrigger className="input-field"><SelectValue placeholder="Selecciona un curso" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Sin curso asignado</SelectItem>
-                {courses.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="schedule_info" className="text-white/80">Horario (Informativo)</Label>
-            <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : value }))} value={formData.schedule_info || 'none'}>
-              <SelectTrigger className="input-field"><SelectValue placeholder="Selecciona un horario" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Sin horario asignado</SelectItem>
-                {schedules.map(s => <SelectItem key={s.id} value={s.id}>{formatScheduleLabel(s)}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div><Label htmlFor="emergency_contact_name" className="text-white/80">Contacto de Emergencia</Label><Input id="emergency_contact_name" value={formData.emergency_contact_name || ''} onChange={(e) => setFormData(prev => ({ ...prev, emergency_contact_name: e.target.value }))} className="input-field" /></div>
-          <div><Label htmlFor="emergency_contact_phone" className="text-white/80">Teléfono de Emergencia</Label><Input id="emergency_contact_phone" value={formData.emergency_contact_phone || ''} onChange={(e) => setFormData(prev => ({ ...prev, emergency_contact_phone: e.target.value }))} className="input-field" /></div>
-          <div><Label htmlFor="notes" className="text-white/80">Notas</Label><Input id="notes" value={formData.notes || ''} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} className="input-field" placeholder="Notas adicionales sobre el estudiante" /></div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="first_name" className="text-slate-200 font-medium mb-2 block">Nombre</Label>
+              <Input id="first_name" value={formData.first_name || ''} onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            </div>
+            <div>
+              <Label htmlFor="last_name" className="text-slate-200 font-medium mb-2 block">Apellido</Label>
+              <Input id="last_name" value={formData.last_name || ''} onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            </div>
+            <div>
+              <Label htmlFor="student_number" className="text-slate-200 font-medium mb-2 block">Número de Estudiante</Label>
+              <Input id="student_number" value={formData.student_number || ''} onChange={(e) => setFormData(prev => ({ ...prev, student_number: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            </div>
+            <div>
+              <Label htmlFor="email" className="text-slate-200 font-medium mb-2 block">Email</Label>
+              <Input id="email" type="email" value={formData.email || ''} onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            </div>
+            <div>
+              <Label htmlFor="phone" className="text-slate-200 font-medium mb-2 block">Teléfono</Label>
+              <Input id="phone" value={formData.phone || ''} onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
+            </div>
+            <div>
+              <Label htmlFor="address" className="text-slate-200 font-medium mb-2 block">Dirección</Label>
+              <Input id="address" value={formData.address || ''} onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            </div>
+            <div>
+              <Label htmlFor="birth_date" className="text-slate-200 font-medium mb-2 block">Fecha de Nacimiento</Label>
+              <Input id="birth_date" type="date" value={formData.birth_date || ''} onChange={(e) => setFormData(prev => ({ ...prev, birth_date: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            </div>
+            <div>
+              <Label htmlFor="course_id" className="text-slate-200 font-medium mb-2 block">Curso</Label>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, course_id: value === 'none' ? null : value }))} value={formData.course_id || 'none'}>
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                  <SelectValue placeholder="Selecciona un curso">
+                    {formData.course_id && formData.course_id !== 'none' ? 
+                      courses.find(c => String(c.id) === String(formData.course_id))?.name || 'Curso seleccionado'
+                      : formData.course_id === 'none' || !formData.course_id
+                        ? 'Sin curso asignado' 
+                        : 'Selecciona un curso'
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600">
+                  <SelectItem value="none" className="text-white hover:bg-slate-700 focus:bg-slate-700">Sin curso asignado</SelectItem>
+                  {courses.map(c => (
+                    <SelectItem key={c.id} value={c.id} className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="schedule_info" className="text-slate-200 font-medium mb-2 block">Horario (Informativo)</Label>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : value }))} value={formData.schedule_info || 'none'}>
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                  <SelectValue placeholder="Selecciona un horario">
+                    {formData.schedule_info && formData.schedule_info !== 'none' ? 
+                      (() => {
+                        const selectedSchedule = schedules.find(s => String(s.id) === String(formData.schedule_info));
+                        return selectedSchedule ? formatScheduleLabel(selectedSchedule) : 'Horario seleccionado';
+                      })()
+                      : formData.schedule_info === 'none' || !formData.schedule_info
+                        ? 'Sin horario asignado' 
+                        : 'Selecciona un horario'
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600 max-h-60 overflow-y-auto">
+                  <SelectItem value="none" className="text-white hover:bg-slate-700 focus:bg-slate-700">Sin horario asignado</SelectItem>
+                  {schedules.map(s => (
+                    <SelectItem key={s.id} value={s.id} className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                      {formatScheduleLabel(s)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="emergency_contact_name" className="text-slate-200 font-medium mb-2 block">Contacto de Emergencia</Label>
+              <Input id="emergency_contact_name" value={formData.emergency_contact_name || ''} onChange={(e) => setFormData(prev => ({ ...prev, emergency_contact_name: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
+            </div>
+            <div>
+              <Label htmlFor="emergency_contact_phone" className="text-slate-200 font-medium mb-2 block">Teléfono de Emergencia</Label>
+              <Input id="emergency_contact_phone" value={formData.emergency_contact_phone || ''} onChange={(e) => setFormData(prev => ({ ...prev, emergency_contact_phone: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
+            </div>
+            <div>
+              <Label htmlFor="notes" className="text-slate-200 font-medium mb-2 block">Notas</Label>
+              <Input id="notes" value={formData.notes || ''} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" placeholder="Notas adicionales sobre el estudiante" />
+            </div>
 
           </div>
-          <DialogFooter className="modal-footer">
+          <DialogFooter className="gap-2">
             <DialogClose asChild>
-              <Button type="button" className="modal-button-cancel">
+              <Button type="button" variant="secondary" className="bg-slate-600 hover:bg-slate-500 text-white border-slate-500">
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" className="modal-button-primary" disabled={isSubmitting}>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white flex-1" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {student ? 'Actualizar' : 'Registrar'} Estudiante
             </Button>
