@@ -158,21 +158,19 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
             </div>
             <div>
               <Label htmlFor="course_id" className="text-slate-200 font-medium mb-2 block">Curso</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, course_id: value === 'none' ? null : value }))} value={formData.course_id || 'none'}>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, course_id: value === 'none' ? null : parseInt(value) }))} value={formData.course_id ? String(formData.course_id) : 'none'}>
                 <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
                   <SelectValue placeholder="Selecciona un curso">
-                    {formData.course_id && formData.course_id !== 'none' ? 
+                    {formData.course_id ? 
                       courses.find(c => String(c.id) === String(formData.course_id))?.name || 'Curso seleccionado'
-                      : formData.course_id === 'none' || !formData.course_id
-                        ? 'Sin curso asignado' 
-                        : 'Selecciona un curso'
+                      : 'Sin curso asignado'
                     }
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
                   <SelectItem value="none" className="text-white hover:bg-slate-700 focus:bg-slate-700">Sin curso asignado</SelectItem>
                   {courses.map(c => (
-                    <SelectItem key={c.id} value={c.id} className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                    <SelectItem key={c.id} value={String(c.id)} className="text-white hover:bg-slate-700 focus:bg-slate-700">
                       {c.name}
                     </SelectItem>
                   ))}
@@ -181,24 +179,22 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
             </div>
             <div>
               <Label htmlFor="schedule_info" className="text-slate-200 font-medium mb-2 block">Horario (Informativo)</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : value }))} value={formData.schedule_info || 'none'}>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : parseInt(value) }))} value={formData.schedule_info ? String(formData.schedule_info) : 'none'}>
                 <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
                   <SelectValue placeholder="Selecciona un horario">
-                    {formData.schedule_info && formData.schedule_info !== 'none' ? 
+                    {formData.schedule_info ? 
                       (() => {
                         const selectedSchedule = schedules.find(s => String(s.id) === String(formData.schedule_info));
                         return selectedSchedule ? formatScheduleLabel(selectedSchedule) : 'Horario seleccionado';
                       })()
-                      : formData.schedule_info === 'none' || !formData.schedule_info
-                        ? 'Sin horario asignado' 
-                        : 'Selecciona un horario'
+                      : 'Sin horario asignado'
                     }
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600 max-h-60 overflow-y-auto">
                   <SelectItem value="none" className="text-white hover:bg-slate-700 focus:bg-slate-700">Sin horario asignado</SelectItem>
                   {schedules.map(s => (
-                    <SelectItem key={s.id} value={s.id} className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                    <SelectItem key={s.id} value={String(s.id)} className="text-white hover:bg-slate-700 focus:bg-slate-700">
                       {formatScheduleLabel(s)}
                     </SelectItem>
                   ))}
