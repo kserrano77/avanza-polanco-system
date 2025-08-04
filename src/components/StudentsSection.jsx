@@ -70,8 +70,8 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     const dataToSave = { 
       ...formData, 
       enrollment_date: student?.enrollment_date || new Date().toISOString().split('T')[0],
-      schedule_id: formData.schedule_info === 'none' || !formData.schedule_info ? null : formData.schedule_info,
-      course_id: formData.course_id === 'none' || !formData.course_id ? null : formData.course_id
+      course_id: formData.course_id === 'none' || !formData.course_id ? null : formData.course_id,
+      schedule_id: formData.schedule_info === 'none' || !formData.schedule_info ? null : formData.schedule_info
     };
     
     // Remover schedule_info ya que usamos schedule_id en la BD
