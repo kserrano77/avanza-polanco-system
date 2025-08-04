@@ -14,7 +14,8 @@ import {
   FileBarChart2,
   FileBox,
   Scissors,
-  History
+  History,
+  Tags
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -29,6 +30,7 @@ const navItems = [
   // { icon: FileBox, label: 'Documentos', section: 'documents' }, // OCULTO - Para reactivar después
   { icon: BookOpen, label: 'Cursos', section: 'courses' },
   { icon: Calendar, label: 'Horarios', section: 'schedule' },
+  { icon: Tags, label: 'Conceptos', section: 'concepts' },
   { icon: Settings, label: 'Ajustes', section: 'settings' },
 ];
 

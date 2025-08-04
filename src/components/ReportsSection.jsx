@@ -7,10 +7,11 @@ import { DollarSign, Users, TrendingUp, FileText, Calendar, Loader2, Archive, Us
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
-import { generateIncomeByConceptPdf, generateEnrollmentsPdf, generateCashCutsPdf } from '@/lib/pdfGenerator';
+import { generateIncomeByConceptPdf, generateEnrollmentsPdf, generateCashCutsPdf, generatePaymentsByConceptPdf } from '@/lib/pdfGenerator';
 
 const CustomTooltip = ({ active, payload, label, formatter }) => {
   if (active && payload && payload.length) {
@@ -32,6 +33,8 @@ const ReportsSection = ({ schoolSettings }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState({ payments: [], students: [], cashCuts: [] });
+  const [selectedConcept, setSelectedConcept] = useState('');
+  const [paymentConcepts, setPaymentConcepts] = useState([]);
   
   const today = new Date();
   const firstDayOfMonth = format(startOfMonth(today), 'yyyy-MM-dd');
@@ -81,9 +84,76 @@ const ReportsSection = ({ schoolSettings }) => {
     }
   }, [dateRange, toast]);
 
+  // Cargar conceptos de pago desde la base de datos
+  const loadPaymentConcepts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('payment_concepts')
+        .select('*')
+        .eq('active', true)
+        .order('name');
+      
+      if (error) throw error;
+      setPaymentConcepts(data || []);
+    } catch (error) {
+      console.error('Error loading payment concepts:', error);
+      // Fallback a conceptos predefinidos si hay error
+      setPaymentConcepts([
+        { id: 1, name: 'Colegiatura Enfermeria' },
+        { id: 2, name: 'Colegiatura Podologia' },
+        { id: 3, name: 'Colegiatura Preparatoria' },
+        { id: 4, name: 'Colegiatura Secundaria' },
+        { id: 5, name: 'Inscripcion' },
+        { id: 6, name: 'Re inscripcion' },
+        { id: 7, name: 'Certificacion' }
+      ]);
+    }
+  };
+
   useEffect(() => {
     fetchReportData();
+    loadPaymentConcepts();
   }, []);
+
+  // Función para generar reporte por concepto específico
+  const generateConceptReport = async () => {
+    if (!selectedConcept) {
+      setTimeout(() => {
+        alert('⚠️ Selecciona un concepto\n\nPor favor, selecciona un concepto para generar el reporte.');
+      }, 100);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Obtener todos los pagos y estudiantes para el reporte
+      const [paymentsRes, studentsRes] = await Promise.all([
+        supabase.from('payments').select('*').gte('paid_date', dateRange.from).lte('paid_date', dateRange.to),
+        supabase.from('students').select('*')
+      ]);
+
+      if (paymentsRes.error) throw paymentsRes.error;
+      if (studentsRes.error) throw studentsRes.error;
+
+      await generatePaymentsByConceptPdf(
+        paymentsRes.data,
+        studentsRes.data,
+        selectedConcept,
+        dateRange,
+        schoolSettings
+      );
+
+      setTimeout(() => {
+        alert(`✅ Reporte generado\n\nReporte de ${selectedConcept} descargado exitosamente.`);
+      }, 100);
+    } catch (error) {
+      setTimeout(() => {
+        alert('❌ Error al generar reporte: ' + error.message);
+      }, 100);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // --- Data Processing ---
   const totalRevenue = reportData.payments.reduce((sum, p) => sum + Number(p.amount), 0);
@@ -145,8 +215,9 @@ const ReportsSection = ({ schoolSettings }) => {
           </div>
 
           <Tabs defaultValue="income">
-            <TabsList className="grid w-full grid-cols-3 bg-white/10 border-white/20">
+            <TabsList className="grid w-full grid-cols-4 bg-white/10 border-white/20">
               <TabsTrigger value="income">Ingresos por Concepto</TabsTrigger>
+              <TabsTrigger value="concept_detail">Reporte por Concepto</TabsTrigger>
               <TabsTrigger value="enrollments">Inscripciones</TabsTrigger>
               <TabsTrigger value="cash_cuts">Cortes de Caja</TabsTrigger>
             </TabsList>
@@ -162,6 +233,55 @@ const ReportsSection = ({ schoolSettings }) => {
                 </CardHeader>
                 <CardContent>
                   <div className="h-80"><ResponsiveContainer width="100%" height="100%"><BarChart data={incomeByConceptData}><XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} /><YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value/1000}k`} /><Tooltip content={<CustomTooltip formatter={(value) => `$${value.toLocaleString()}`} />} cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }} /><Bar dataKey="Ingresos" fill="url(#colorIncome)" radius={[4, 4, 0, 0]} /><defs><linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/><stop offset="95%" stopColor="#a855f7" stopOpacity={0.2}/></linearGradient></defs></BarChart></ResponsiveContainer></div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="concept_detail" className="mt-6">
+              <Card className="glass-effect border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white">Reporte Detallado por Concepto</CardTitle>
+                  <CardDescription className="text-white/60">Genera un reporte detallado con nombres de alumnos y cantidades pagadas para un concepto específico.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap items-end gap-4">
+                    <div className="flex-1 min-w-[200px]">
+                      <Label htmlFor="concept-select" className="text-slate-200 font-medium mb-2 block">Seleccionar Concepto</Label>
+                      <Select value={selectedConcept} onValueChange={setSelectedConcept}>
+                        <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                          <SelectValue placeholder="Seleccionar concepto">
+                            {selectedConcept || 'Seleccionar concepto'}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-600">
+                          {paymentConcepts.map(concept => (
+                            <SelectItem key={concept.id} value={concept.name} className="text-white hover:bg-slate-700">
+                              {concept.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button onClick={generateConceptReport} className="btn-primary" disabled={loading || !selectedConcept}>
+                      {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+                      Generar Reporte PDF
+                    </Button>
+                  </div>
+                  
+                  {selectedConcept && (
+                    <div className="mt-6 p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
+                      <h4 className="text-white font-medium mb-2">Vista Previa del Reporte</h4>
+                      <p className="text-slate-300 text-sm mb-2">
+                        El reporte incluirá todos los pagos de <span className="font-semibold text-blue-400">{selectedConcept}</span> en el periodo seleccionado.
+                      </p>
+                      <div className="text-slate-400 text-xs">
+                        <p>• Nombre completo del alumno</p>
+                        <p>• Cantidad pagada</p>
+                        <p>• Fecha de pago</p>
+                        <p>• Total general del concepto</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

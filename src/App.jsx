@@ -20,6 +20,7 @@ import ScheduleSection from '@/components/ScheduleSection';
 import AccountStatementSection from '@/components/AccountStatementSection';
 import CashCutSection from '@/components/CashCutSection';
 import UserManagementSection from '@/components/UserManagementSection';
+import ConceptsManagementSection from '@/components/ConceptsManagementSection';
 import Login from '@/components/Login';
 import { Loader2 } from 'lucide-react';
 import PlaceholderSection from '@/components/PlaceholderSection';
@@ -274,6 +275,8 @@ function App() {
         return <ScheduleSection schedules={schedules} courses={courses} refreshData={fetchProfileAndData} schoolSettings={schoolSettings} />;
       case 'audit':
         return <AuditLogSection />;
+      case 'concepts':
+        return <ConceptsManagementSection />;
       case 'settings':
         return <SettingsSection onSettingsChange={handleSettingsUpdate} />;
       default:

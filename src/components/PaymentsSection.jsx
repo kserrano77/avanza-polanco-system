@@ -32,7 +32,40 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
   const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', payment_date: '', debt_amount: '', debt_description: '' });
   const [sendReceipt, setSendReceipt] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentConcepts, setPaymentConcepts] = useState([]);
   const { toast } = useToast();
+
+  // Cargar conceptos de pago desde la base de datos
+  const loadPaymentConcepts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('payment_concepts')
+        .select('*')
+        .eq('active', true)
+        .order('name');
+      
+      if (error) throw error;
+      setPaymentConcepts(data || []);
+    } catch (error) {
+      console.error('Error loading payment concepts:', error);
+      // Fallback a conceptos predefinidos si hay error
+      setPaymentConcepts([
+        { id: 1, name: 'Colegiatura Enfermeria' },
+        { id: 2, name: 'Colegiatura Podologia' },
+        { id: 3, name: 'Colegiatura Preparatoria' },
+        { id: 4, name: 'Colegiatura Secundaria' },
+        { id: 5, name: 'Inscripcion' },
+        { id: 6, name: 'Re inscripcion' },
+        { id: 7, name: 'Certificacion' }
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      loadPaymentConcepts();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (payment) {
@@ -302,7 +335,20 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
           </div>
           <div>
             <Label htmlFor="concept" className="text-slate-200 font-medium mb-2 block">Concepto</Label>
-            <Input id="concept" value={formData.concept} onChange={(e) => setFormData(prev => ({ ...prev, concept: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" placeholder="Ej: Mensualidad Enero 2024" required />
+            <Select value={formData.concept} onValueChange={(value) => setFormData(prev => ({ ...prev, concept: value }))}>
+              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
+                <SelectValue placeholder="Seleccionar concepto">
+                  {formData.concept || 'Seleccionar concepto'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-slate-600">
+                {paymentConcepts.map(concept => (
+                  <SelectItem key={concept.id} value={concept.name} className="text-white hover:bg-slate-700">
+                    {concept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label htmlFor="payment_date" className="text-slate-200 font-medium mb-2 block">Fecha de Vencimiento</Label>

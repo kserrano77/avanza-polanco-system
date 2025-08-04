@@ -233,6 +233,63 @@ export const generateIncomeByConceptPdf = async (payments, dateRange, schoolSett
   doc.save(`reporte_ingresos_concepto_${dateRange.from}_${dateRange.to}.pdf`);
 };
 
+export const generatePaymentsByConceptPdf = async (payments, students, concept, dateRange, schoolSettings) => {
+  const doc = new jsPDF();
+  let startY = await drawHeader(doc, schoolSettings, `Reporte Detallado: ${concept}`);
+  
+  doc.setFontSize(12);
+  doc.text(`Periodo: ${format(parseISO(dateRange.from), 'dd/MM/yyyy')} - ${format(parseISO(dateRange.to), 'dd/MM/yyyy')}`, 15, startY);
+  startY += 15;
+
+  // Filtrar pagos por concepto
+  const conceptPayments = payments.filter(p => p.concept === concept && p.status === 'paid');
+  
+  if (conceptPayments.length === 0) {
+    doc.setFontSize(14);
+    doc.text('No se encontraron pagos para este concepto en el periodo seleccionado.', 15, startY);
+    doc.save(`reporte_${concept.replace(/\s+/g, '_')}_${dateRange.from}_${dateRange.to}.pdf`);
+    return;
+  }
+
+  // Crear tabla con detalles
+  const tableBody = conceptPayments.map(payment => {
+    const student = students.find(s => s.id === payment.student_id);
+    const studentName = student ? `${student.first_name} ${student.last_name}` : 'Estudiante no encontrado';
+    const paymentDate = payment.paid_date ? format(parseISO(payment.paid_date), 'dd/MM/yyyy') : format(parseISO(payment.created_at), 'dd/MM/yyyy');
+    
+    return [
+      studentName,
+      `$${Number(payment.amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+      paymentDate
+    ];
+  });
+
+  // Calcular total
+  const totalAmount = conceptPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+  
+  // Agregar fila de total
+  tableBody.push([
+    { content: `Total (${conceptPayments.length} pagos):`, styles: { fontStyle: 'bold' } },
+    { content: `$${totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, styles: { fontStyle: 'bold' } },
+    { content: '', styles: { fontStyle: 'bold' } }
+  ]);
+
+  doc.autoTable({
+    startY,
+    head: [['Nombre del Alumno', 'Cantidad Pagada', 'Fecha de Pago']],
+    body: tableBody,
+    theme: 'striped',
+    headStyles: { fillColor: [41, 128, 185] },
+    columnStyles: {
+      0: { cellWidth: 80 },
+      1: { cellWidth: 40, halign: 'right' },
+      2: { cellWidth: 40, halign: 'center' }
+    }
+  });
+
+  doc.save(`reporte_${concept.replace(/\s+/g, '_')}_${dateRange.from}_${dateRange.to}.pdf`);
+};
+
 export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings) => {
   const doc = new jsPDF();
   let startY = await drawHeader(doc, schoolSettings, 'Reporte de Inscripciones');
