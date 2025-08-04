@@ -99,10 +99,17 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
       refreshData();
       setOpen(false);
     } catch (error) {
+      let errorMessage = error.message;
+      
+      // Manejo específico para número de estudiante duplicado
+      if (error.code === '23505' && error.message && error.message.includes('students_student_number_key')) {
+        errorMessage = 'Ya existe un estudiante con este número. Por favor, usa un número diferente.';
+      }
+      
       toast({
         variant: "destructive",
         title: "Error al guardar el estudiante",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
