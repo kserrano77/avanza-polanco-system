@@ -76,12 +76,18 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     
     // Remover schedule_info ya que usamos schedule_id en la BD
     delete dataToSave.schedule_info;
+    
+    // Debug: mostrar datos que se van a guardar
+    console.log('🔍 Debug - Datos a guardar:', dataToSave);
+    console.log('🔍 Debug - formData original:', formData);
 
     try {
       let error;
       if (student) {
+        console.log('🔄 Actualizando estudiante ID:', student.id);
         ({ error } = await supabase.from('students').update(dataToSave).eq('id', student.id));
       } else {
+        console.log('🔄 Insertando nuevo estudiante');
         ({ error } = await supabase.from('students').insert([dataToSave]));
       }
       
