@@ -67,11 +67,15 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     e.preventDefault();
     setIsSubmitting(true);
     
-    const { schedule_info, ...formDataToSave } = formData;
     const dataToSave = { 
-      ...formDataToSave, 
-      enrollment_date: student?.enrollment_date || new Date().toISOString().split('T')[0]
+      ...formData, 
+      enrollment_date: student?.enrollment_date || new Date().toISOString().split('T')[0],
+      schedule_id: formData.schedule_info === 'none' || !formData.schedule_info ? null : formData.schedule_info,
+      course_id: formData.course_id === 'none' || !formData.course_id ? null : formData.course_id
     };
+    
+    // Remover schedule_info ya que usamos schedule_id en la BD
+    delete dataToSave.schedule_info;
 
     try {
       let error;
