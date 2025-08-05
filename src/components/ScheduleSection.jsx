@@ -151,9 +151,9 @@ const AttendanceListDialog = ({ isOpen, setIsOpen, schedule, schoolSettings }) =
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="glass-effect border-purple-500 sm:max-w-[600px] text-white">
+            <DialogContent className="bg-slate-800/95 backdrop-blur-md border-slate-600/30 text-white shadow-2xl sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle className="gradient-text">Alumnos Inscritos</DialogTitle>
+                    <DialogTitle className="text-white text-xl font-semibold">Alumnos Inscritos</DialogTitle>
                     <DialogDescription className="text-white/60">{scheduleTitle}</DialogDescription>
                 </DialogHeader>
                 {loading ? (
@@ -174,9 +174,17 @@ const AttendanceListDialog = ({ isOpen, setIsOpen, schedule, schoolSettings }) =
                                              <TableCell className="font-medium text-white">{`${student.first_name} ${student.last_name}`}</TableCell>
                                              <TableCell className="text-white/80">{student.email}</TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {students.map(student => (
+                                            <TableRow key={student.id} className="border-slate-700 hover:bg-slate-800/50">
+                                                 <TableCell className="font-medium text-slate-100">{`${student.first_name} ${student.last_name}`}</TableCell>
+                                                 <TableCell className="text-slate-300">{student.email}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         ) : (
                             <p className="text-center text-white/60 py-8">No hay estudiantes activos asignados a este horario.</p>
                         )}
