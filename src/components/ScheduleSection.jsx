@@ -171,8 +171,8 @@ const AttendanceListDialog = ({ isOpen, setIsOpen, schedule, schoolSettings }) =
                                 <TableBody>
                                     {students.map(student => (
                                         <TableRow key={student.id} className="border-white/10">
-                                             <TableCell className="font-medium">{`${student.first_name} ${student.last_name}`}</TableCell>
-                                            <TableCell>{student.email}</TableCell>
+                                             <TableCell className="font-medium text-white">{`${student.first_name} ${student.last_name}`}</TableCell>
+                                             <TableCell className="text-white/80">{student.email}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
