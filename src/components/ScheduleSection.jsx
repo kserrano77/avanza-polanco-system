@@ -161,18 +161,12 @@ const AttendanceListDialog = ({ isOpen, setIsOpen, schedule, schoolSettings }) =
                 ) : (
                     <div className="max-h-[60vh] overflow-y-auto pr-2">
                         {students.length > 0 ? (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="border-white/20">
-                                        <TableHead className="text-white/80">Nombre del Estudiante</TableHead>
-                                        <TableHead className="text-white/80">Email</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {students.map(student => (
-                                        <TableRow key={student.id} className="border-white/10">
-                                             <TableCell className="font-medium text-white">{`${student.first_name} ${student.last_name}`}</TableCell>
-                                             <TableCell className="text-white/80">{student.email}</TableCell>
+                            <div className="bg-slate-900/50 rounded-lg p-4">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="border-slate-600">
+                                            <TableHead className="text-slate-200 font-semibold">Nombre del Estudiante</TableHead>
+                                            <TableHead className="text-slate-200 font-semibold">Email</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
