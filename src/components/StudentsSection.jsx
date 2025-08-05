@@ -511,7 +511,12 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
                           {student.courses?.name || 'Sin curso'}
                         </div>
                       </TableCell>
-                      <TableCell className="text-white/80"><div className="flex items-center gap-2"><Clock className="w-4 h-4" />{formatScheduleLabel(student.schedules)}</div></TableCell>
+                      <TableCell className="text-white/80">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          {student.schedules ? formatScheduleLabel(student.schedules) : 'No asignado'}
+                        </div>
+                      </TableCell>
                       <TableCell>{getStatusBadge(student.status)}</TableCell>
                       <TableCell className="text-white/80">{student.enrollment_date ? format(parseISO(student.enrollment_date), 'dd MMM yyyy') : 'N/A'}</TableCell>
                       <TableCell className="text-right">
