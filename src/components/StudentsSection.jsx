@@ -175,7 +175,7 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
             </div>
             <div>
               <Label htmlFor="course_id" className="text-slate-200 font-medium mb-2 block">Curso</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, course_id: value === 'none' ? null : parseInt(value) }))} value={formData.course_id ? String(formData.course_id) : 'none'}>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, course_id: value === 'none' ? null : value }))} value={formData.course_id ? String(formData.course_id) : 'none'}>
                 <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
                   <SelectValue placeholder="Selecciona un curso">
                     {formData.course_id ? 
@@ -196,7 +196,7 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
             </div>
             <div>
               <Label htmlFor="schedule_info" className="text-slate-200 font-medium mb-2 block">Horario (Informativo)</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : parseInt(value) }))} value={formData.schedule_info ? String(formData.schedule_info) : 'none'}>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : value }))} value={formData.schedule_info ? String(formData.schedule_info) : 'none'}>
                 <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
                   <SelectValue placeholder="Selecciona un horario">
                     {formData.schedule_info ? 
