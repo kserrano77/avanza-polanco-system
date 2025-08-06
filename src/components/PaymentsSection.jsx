@@ -28,6 +28,109 @@ const getLocalDateString = () => {
     return `${year}-${month}-${day}`;
 };
 
+// Componente de búsqueda de estudiantes con autocompletado
+const StudentSearchField = ({ students, selectedStudentId, onStudentSelect }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  
+  // Filtrar estudiantes basado en el término de búsqueda
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredStudents(students.slice(0, 10)); // Mostrar solo los primeros 10 si no hay búsqueda
+    } else {
+      const filtered = students.filter(student => {
+        const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
+        const searchLower = searchTerm.toLowerCase();
+        return fullName.includes(searchLower) || 
+               student.first_name.toLowerCase().includes(searchLower) ||
+               student.last_name.toLowerCase().includes(searchLower);
+      });
+      setFilteredStudents(filtered.slice(0, 20)); // Limitar a 20 resultados
+    }
+  }, [searchTerm, students]);
+  
+  // Obtener el estudiante seleccionado
+  const selectedStudent = students.find(s => String(s.id) === String(selectedStudentId));
+  
+  const handleStudentSelect = (student) => {
+    onStudentSelect(student.id);
+    setSearchTerm(`${student.first_name} ${student.last_name}`);
+    setIsOpen(false);
+  };
+  
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setIsOpen(true);
+    
+    // Si se borra el campo, limpiar la selección
+    if (value.trim() === '') {
+      onStudentSelect('');
+    }
+  };
+  
+  // Establecer el valor inicial cuando se selecciona un estudiante externamente
+  useEffect(() => {
+    if (selectedStudent && !searchTerm) {
+      setSearchTerm(`${selectedStudent.first_name} ${selectedStudent.last_name}`);
+    } else if (!selectedStudentId) {
+      setSearchTerm('');
+    }
+  }, [selectedStudent, selectedStudentId]);
+  
+  return (
+    <div className="relative">
+      <Label htmlFor="student_search" className="text-slate-200 font-medium mb-2 block">
+        Estudiante
+      </Label>
+      <div className="relative">
+        <Input
+          id="student_search"
+          type="text"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={() => setIsOpen(true)}
+          placeholder="Buscar por nombre o apellido..."
+          className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 pr-10"
+          autoComplete="off"
+        />
+        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+      </div>
+      
+      {/* Dropdown de resultados */}
+      {isOpen && filteredStudents.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          {filteredStudents.map(student => (
+            <div
+              key={student.id}
+              onClick={() => handleStudentSelect(student)}
+              className="px-3 py-2 cursor-pointer hover:bg-slate-700 text-white border-b border-slate-700 last:border-b-0 transition-colors"
+            >
+              <div className="font-medium">
+                {student.first_name} {student.last_name}
+              </div>
+              {student.email && (
+                <div className="text-sm text-slate-400">
+                  {student.email}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Cerrar dropdown al hacer click fuera */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+    </div>
+  );
+};
+
 const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSettings }) => {
   const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', payment_date: '', debt_amount: '', debt_description: '' });
   const [sendReceipt, setSendReceipt] = useState(true);
@@ -309,26 +412,11 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
           <DialogDescription className="text-slate-300">{payment ? 'Actualiza los detalles del pago.' : 'Completa los campos para registrar un nuevo pago.'}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="student_id" className="text-slate-200 font-medium mb-2 block">Estudiante</Label>
-            <Select value={formData.student_id?.toString() || ''} onValueChange={(value) => setFormData(prev => ({ ...prev, student_id: value }))}>
-              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
-                <SelectValue placeholder="Seleccionar estudiante">
-                  {formData.student_id ? 
-                    students.find(s => String(s.id) === String(formData.student_id))?.first_name + ' ' + students.find(s => String(s.id) === String(formData.student_id))?.last_name || 'Estudiante seleccionado'
-                    : 'Seleccionar estudiante'
-                  }
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600">
-                {students.map(student => (
-                  <SelectItem key={student.id} value={student.id.toString()} className="text-white hover:bg-slate-700 focus:bg-slate-700">
-                    {`${student.first_name} ${student.last_name}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <StudentSearchField 
+            students={students}
+            selectedStudentId={formData.student_id}
+            onStudentSelect={(studentId) => setFormData(prev => ({ ...prev, student_id: studentId }))}
+          />
           <div>
             <Label htmlFor="amount" className="text-slate-200 font-medium mb-2 block">Monto Pagado</Label>
             <Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" required />
