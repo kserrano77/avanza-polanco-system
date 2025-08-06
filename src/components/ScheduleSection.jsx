@@ -120,7 +120,7 @@ const AttendanceListDialog = ({ isOpen, setIsOpen, schedule, schoolSettings }) =
                 const { data, error } = await supabase
                     .from('students')
                     .select('*')
-                    .eq('course_id', schedule.course_id)
+                    .eq('schedule_id', schedule.id)
                     .eq('status', 'active');
                 if (error) {
                   console.warn('Error en operación de horario:', error);
