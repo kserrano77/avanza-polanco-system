@@ -465,7 +465,9 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
     const day = daysOfWeek[schedule.day_of_week] || 'Día desc.';
     const startTime = schedule.start_time.slice(0, 5);
     const endTime = schedule.end_time.slice(0, 5);
-    return `${day} ${startTime}-${endTime}`;
+    // CORREGIDO: Mostrar curso desde la relación courses del horario
+    const courseName = schedule.courses?.name || 'Curso desc.';
+    return `${courseName} - ${day} ${startTime}-${endTime}`;
   };
 
   return (
@@ -514,7 +516,11 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
                       <TableCell className="text-white/80">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4" />
-                          {student.schedules ? formatScheduleLabel(student.schedules) : 'No asignado'}
+                          {(() => {
+                            // CORREGIDO: Buscar horario usando schedule_id del estudiante
+                            const studentSchedule = schedules.find(s => String(s.id) === String(student.schedule_id));
+                            return studentSchedule ? formatScheduleLabel(studentSchedule) : 'No asignado';
+                          })()}
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(student.status)}</TableCell>
