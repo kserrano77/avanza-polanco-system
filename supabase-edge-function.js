@@ -15,15 +15,24 @@ serve(async (req) => {
   }
 
   try {
-    const { student, payment } = await req.json()
+    const requestData = await req.json()
+    console.log('📥 Received request data:', JSON.stringify(requestData, null, 2))
+    
+    const { student, payment, isReprint = false } = requestData
 
     if (!student || !payment) {
+      console.error('❌ Missing data - student:', !!student, 'payment:', !!payment)
       throw new Error('Missing student or payment data')
     }
 
     if (!student.email) {
+      console.error('❌ Student data:', JSON.stringify(student, null, 2))
       throw new Error('Student email is required')
     }
+    
+    console.log('✅ Data validation passed')
+    console.log('👤 Student:', student.first_name + ' ' + student.last_name, '- Email:', student.email)
+    console.log('💰 Payment:', payment.concept, '- Amount:', payment.amount)
 
     // Try multiple logo sources for better compatibility
     const projectUrl = Deno.env.get('PROJECT_URL') ?? 'https://gvrgepdjxzhgqkmtwcvs.supabase.co'
@@ -46,11 +55,12 @@ serve(async (req) => {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
           ${logoHtml}
-          <h1 style="margin: 0; font-size: 28px;">Avanza Cd Obregón</h1>
+          <h1 style="margin: 0; font-size: 28px;">Avanza Polanco</h1>
           <p style="margin: 10px 0 0 0; opacity: 0.9;">Comprobante de Pago</p>
+          ${isReprint ? `<div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin-top: 10px; font-size: 14px; font-weight: bold;">📄 Re impresión de tu pago del día: ${payment.payment_date || payment.paid_date || new Date().toLocaleDateString('es-MX')}</div>` : ''}
         </div>
         <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-          <h2 style="color: #333; margin-top: 0;">Estimado/a ${student.name},</h2>
+          <h2 style="color: #333; margin-top: 0;">Estimado/a ${student.first_name} ${student.last_name},</h2>
           <p style="color: #666; line-height: 1.6;">Hemos recibido su pago correctamente. A continuación los detalles:</p>
           
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -74,7 +84,7 @@ serve(async (req) => {
           <p style="color: #666; line-height: 1.6;">Gracias por su pago puntual. Si tiene alguna pregunta, no dude en contactarnos.</p>
           
           <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 14px; margin: 0;">Avanza Cd Obregón</p>
+            <p style="color: #999; font-size: 14px; margin: 0;">Avanza Polanco</p>
             <p style="color: #999; font-size: 14px; margin: 5px 0 0 0;">Comprobante generado automáticamente</p>
           </div>
         </div>
@@ -117,8 +127,15 @@ serve(async (req) => {
     )
 
   } catch (error) {
+    console.error('❌ Edge Function Error:', error)
+    console.error('❌ Error stack:', error.stack)
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack,
+        timestamp: new Date().toISOString()
+      }),
       { 
         status: 500,
         headers: { 
