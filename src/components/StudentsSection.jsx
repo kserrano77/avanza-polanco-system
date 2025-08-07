@@ -269,10 +269,18 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                         <div
                           key={`${s.id}-${s.classroom || 'no-group'}`}
                           className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer whitespace-nowrap"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             console.log('🔥 CLICKED SCHEDULE:', labelText, 'ID:', s.id);
-                            setFormData(prev => ({ ...prev, schedule_info: s.id }));
+                            console.log('📝 BEFORE UPDATE - formData.schedule_info:', formData.schedule_info);
+                            setFormData(prev => {
+                              const newData = { ...prev, schedule_info: s.id };
+                              console.log('📝 AFTER UPDATE - newData.schedule_info:', newData.schedule_info);
+                              return newData;
+                            });
                             setScheduleDropdownOpen(false);
+                            console.log('✅ DROPDOWN CLOSED');
                           }}
                           title={labelText}
                         >
