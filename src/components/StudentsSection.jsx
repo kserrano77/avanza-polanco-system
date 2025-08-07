@@ -243,10 +243,16 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                 </button>
                 
                 {scheduleDropdownOpen && (
-                  <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    <div
-                      className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer"
-                      onClick={() => {
+                  <div 
+                    className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto z-[9999]"
+                    style={{ zIndex: 9999 }}
+                  >
+                    <div 
+                      className="px-3 py-2 text-slate-400 hover:bg-slate-700 cursor-pointer border-b border-slate-600 select-none"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🔥 CLICKED NULL SCHEDULE');
                         setFormData(prev => ({ ...prev, schedule_info: null }));
                         setScheduleDropdownOpen(false);
                       }}
@@ -268,8 +274,8 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                       return (
                         <div
                           key={`${s.id}-${s.classroom || 'no-group'}`}
-                          className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer whitespace-nowrap"
-                          onClick={(e) => {
+                          className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer whitespace-nowrap select-none"
+                          onMouseDown={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             console.log('🔥 CLICKED SCHEDULE:', labelText, 'ID:', s.id);
