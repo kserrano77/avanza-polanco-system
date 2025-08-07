@@ -210,11 +210,19 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600 max-h-60 overflow-y-auto w-full min-w-[400px]">
                   <SelectItem value="none" className="text-white hover:bg-slate-700 focus:bg-slate-700">Sin horario asignado</SelectItem>
-                  {schedules.map(s => (
-                    <SelectItem key={s.id} value={String(s.id)} className="text-white hover:bg-slate-700 focus:bg-slate-700">
-                      {formatScheduleLabel(s)}
-                    </SelectItem>
-                  ))}
+                  {schedules.map(s => {
+                    const labelText = formatScheduleLabel(s);
+                    return (
+                      <SelectItem 
+                        key={`${s.id}-${s.classroom || 'no-group'}`} 
+                        value={String(s.id)} 
+                        className="text-white hover:bg-slate-700 focus:bg-slate-700 whitespace-nowrap overflow-visible text-left w-full"
+                        title={labelText}
+                      >
+                        <span className="block w-full text-left">{labelText}</span>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
