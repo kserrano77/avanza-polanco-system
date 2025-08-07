@@ -508,6 +508,7 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
   };
 
   const formatScheduleLabel = (schedule) => {
+    console.log('🔥 formatScheduleLabel LLAMADA con:', schedule);
     if (!schedule) return 'No asignado';
     
     const courseName = schedule.courses?.name || 'Curso no encontrado';
@@ -516,20 +517,27 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
     const startTime = schedule.start_time || 'Hora no definida';
     const endTime = schedule.end_time || 'Hora no definida';
     
+    console.log('📊 DATOS PROCESADOS:', { courseName, day, startTime, endTime, classroom: schedule.classroom });
+    
     // Agregar información adicional para diferenciar horarios similares
     let additionalInfo = '';
     if (schedule.classroom) {
       // Como el campo classroom se usa para número de grupo, mostrar como "Grupo"
       additionalInfo += ` (Grupo ${schedule.classroom})`;
+      console.log('✅ AGREGANDO GRUPO:', schedule.classroom);
     } else if (schedule.instructor) {
       additionalInfo += ` (Prof: ${schedule.instructor})`;
+      console.log('✅ AGREGANDO INSTRUCTOR:', schedule.instructor);
     } else {
       // Si no hay grupo ni instructor, usar los últimos 4 caracteres del ID como identificador
       const groupId = schedule.id ? schedule.id.slice(-4).toUpperCase() : 'XXXX';
       additionalInfo += ` (Grupo ${groupId})`;
+      console.log('✅ AGREGANDO GRUPO AUTO:', groupId);
     }
     
-    return `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
+    const result = `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
+    console.log('🎯 RESULTADO FINAL formatScheduleLabel:', result);
+    return result;
   };
 
   return (
