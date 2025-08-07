@@ -526,6 +526,31 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
     }
   };
 
+  const formatScheduleLabel = (schedule) => {
+    if (!schedule) return 'No asignado';
+    
+    const courseName = schedule.courses?.name || 'Curso no encontrado';
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const day = dayNames[schedule.day_of_week] || 'Día no válido';
+    const startTime = schedule.start_time || 'Hora no definida';
+    const endTime = schedule.end_time || 'Hora no definida';
+    
+    // Agregar información adicional para diferenciar horarios similares
+    let additionalInfo = '';
+    if (schedule.classroom) {
+      // Como el campo classroom se usa para número de grupo, mostrar como "Grupo"
+      additionalInfo += ` (Grupo ${schedule.classroom})`;
+    } else if (schedule.instructor) {
+      additionalInfo += ` (Prof: ${schedule.instructor})`;
+    } else {
+      // Si no hay grupo ni instructor, usar los últimos 4 caracteres del ID como identificador
+      const groupId = schedule.id ? schedule.id.slice(-4).toUpperCase() : 'XXXX';
+      additionalInfo += ` (Grupo ${groupId})`;
+    }
+    
+    return `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
+  };
+
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-center">
