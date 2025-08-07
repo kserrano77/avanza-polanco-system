@@ -24,6 +24,31 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
   const [scheduleDropdownOpen, setScheduleDropdownOpen] = useState(false);
   const { toast } = useToast();
 
+  const formatScheduleLabel = (schedule) => {
+    if (!schedule) return 'No asignado';
+    
+    const courseName = schedule.courses?.name || 'Curso no encontrado';
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const day = dayNames[schedule.day_of_week] || 'Día no válido';
+    const startTime = schedule.start_time || 'Hora no definida';
+    const endTime = schedule.end_time || 'Hora no definida';
+    
+    // Agregar información adicional para diferenciar horarios similares
+    let additionalInfo = '';
+    if (schedule.classroom) {
+      // Como el campo classroom se usa para número de grupo, mostrar como "Grupo"
+      additionalInfo += ` (Grupo ${schedule.classroom})`;
+    } else if (schedule.instructor) {
+      additionalInfo += ` (Prof: ${schedule.instructor})`;
+    } else {
+      // Si no hay grupo ni instructor, usar los últimos 4 caracteres del ID como identificador
+      const groupId = schedule.id ? schedule.id.slice(-4).toUpperCase() : 'XXXX';
+      additionalInfo += ` (Grupo ${groupId})`;
+    }
+    
+    return `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
+  };
+
   const initialFormState = useMemo(() => ({
     first_name: '',
     last_name: '',
@@ -499,31 +524,6 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
       case 'inactive': return <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 capitalize"><UserX className="w-3 h-3 mr-1" />Inactivo</Badge>;
       default: return <Badge variant="secondary" className="capitalize">{status}</Badge>;
     }
-  };
-
-  const formatScheduleLabel = (schedule) => {
-    if (!schedule) return 'No asignado';
-    
-    const courseName = schedule.courses?.name || 'Curso no encontrado';
-    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const day = dayNames[schedule.day_of_week] || 'Día no válido';
-    const startTime = schedule.start_time || 'Hora no definida';
-    const endTime = schedule.end_time || 'Hora no definida';
-    
-    // Agregar información adicional para diferenciar horarios similares
-    let additionalInfo = '';
-    if (schedule.classroom) {
-      // Como el campo classroom se usa para número de grupo, mostrar como "Grupo"
-      additionalInfo += ` (Grupo ${schedule.classroom})`;
-    } else if (schedule.instructor) {
-      additionalInfo += ` (Prof: ${schedule.instructor})`;
-    } else {
-      // Si no hay grupo ni instructor, usar los últimos 4 caracteres del ID como identificador
-      const groupId = schedule.id ? schedule.id.slice(-4).toUpperCase() : 'XXXX';
-      additionalInfo += ` (Grupo ${groupId})`;
-    }
-    
-    return `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
   };
 
   return (
