@@ -21,6 +21,7 @@ const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sába
 const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }) => {
   const [formData, setFormData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scheduleDropdownOpen, setScheduleDropdownOpen] = useState(false);
   const { toast } = useToast();
 
   const initialFormState = useMemo(() => ({
@@ -41,27 +42,30 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
   }), []);
 
   useEffect(() => {
-    if (open) {
-      if (student) {
-        setFormData({
-          first_name: student.first_name || '',
-          last_name: student.last_name || '',
-          student_number: student.student_number || '',
-          email: student.email || '',
-          phone: student.phone || '',
-          address: student.address || '',
-          birth_date: student.birth_date || '',
-          status: student.status || 'active',
-          emergency_contact_name: student.emergency_contact_name || '',
-          emergency_contact_phone: student.emergency_contact_phone || '',
-          notes: student.notes || '',
-          course_id: student.course_id || null
-        });
-      } else {
-        setFormData(initialFormState);
-      }
+    if (student) {
+      setFormData({
+        ...initialFormState,
+        ...student,
+        birth_date: student.birth_date ? new Date(student.birth_date).toISOString().split('T')[0] : '',
+        enrollment_date: student.enrollment_date ? new Date(student.enrollment_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+      });
+    } else {
+      setFormData(initialFormState);
     }
-  }, [student, open, initialFormState]);
+  }, [student, initialFormState]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (scheduleDropdownOpen && !event.target.closest('.schedule-dropdown')) {
+        setScheduleDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [scheduleDropdownOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -196,9 +200,13 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
             </div>
             <div>
               <Label htmlFor="schedule_info" className="text-slate-200 font-medium mb-2 block">Horario (Informativo)</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, schedule_info: value === 'none' ? null : value }))} value={formData.schedule_info ? String(formData.schedule_info) : 'none'}>
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20">
-                  <SelectValue placeholder="Selecciona un horario">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setScheduleDropdownOpen(!scheduleDropdownOpen)}
+                  className="w-full bg-slate-700/50 border border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20 rounded-md px-3 py-2 text-left flex items-center justify-between hover:bg-slate-700/70"
+                >
+                  <span className="truncate">
                     {formData.schedule_info ? 
                       (() => {
                         const selectedSchedule = schedules.find(s => String(s.id) === String(formData.schedule_info));
@@ -206,25 +214,42 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                       })()
                       : 'Sin horario asignado'
                     }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600 max-h-60 overflow-y-auto w-full min-w-[400px]">
-                  <SelectItem value="none" className="text-white hover:bg-slate-700 focus:bg-slate-700">Sin horario asignado</SelectItem>
-                  {schedules.map(s => {
-                    const labelText = formatScheduleLabel(s);
-                    return (
-                      <SelectItem 
-                        key={`${s.id}-${s.classroom || 'no-group'}`} 
-                        value={String(s.id)} 
-                        className="text-white hover:bg-slate-700 focus:bg-slate-700 whitespace-nowrap overflow-visible text-left w-full"
-                        title={labelText}
-                      >
-                        <span className="block w-full text-left">{labelText}</span>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+                  </span>
+                  <svg className="w-4 h-4 ml-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {scheduleDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div
+                      className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, schedule_info: null }));
+                        setScheduleDropdownOpen(false);
+                      }}
+                    >
+                      Sin horario asignado
+                    </div>
+                    {schedules.map(s => {
+                      const labelText = formatScheduleLabel(s);
+                      return (
+                        <div
+                          key={`${s.id}-${s.classroom || 'no-group'}`}
+                          className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer whitespace-nowrap"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, schedule_info: s.id }));
+                            setScheduleDropdownOpen(false);
+                          }}
+                          title={labelText}
+                        >
+                          {labelText}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <Label htmlFor="emergency_contact_name" className="text-slate-200 font-medium mb-2 block">Contacto de Emergencia</Label>
