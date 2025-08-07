@@ -206,7 +206,7 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                   onClick={() => setScheduleDropdownOpen(!scheduleDropdownOpen)}
                   className="w-full bg-slate-700/50 border border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20 rounded-md px-3 py-2 text-left flex items-center justify-between hover:bg-slate-700/70"
                 >
-                  <span className="truncate">
+                  <span className="flex-1 text-left">
                     {formData.schedule_info ? 
                       (() => {
                         const selectedSchedule = schedules.find(s => String(s.id) === String(formData.schedule_info));
@@ -496,42 +496,26 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
   const formatScheduleLabel = (schedule) => {
     if (!schedule) return 'No asignado';
     
-    // DEBUG: Ver qué datos tiene el schedule
-    console.log('🔍 DEBUG formatScheduleLabel:', {
-      id: schedule.id,
-      classroom: schedule.classroom,
-      instructor: schedule.instructor,
-      courses: schedule.courses,
-      day_of_week: schedule.day_of_week,
-      start_time: schedule.start_time,
-      end_time: schedule.end_time
-    });
-    
-    const day = daysOfWeek[schedule.day_of_week] || 'Día desc.';
-    const startTime = schedule.start_time.slice(0, 5);
-    const endTime = schedule.end_time.slice(0, 5);
-    // CORREGIDO: Mostrar curso desde la relación courses del horario
-    const courseName = schedule.courses?.name || 'Curso desc.';
+    const courseName = schedule.courses?.name || 'Curso no encontrado';
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const day = dayNames[schedule.day_of_week] || 'Día no válido';
+    const startTime = schedule.start_time || 'Hora no definida';
+    const endTime = schedule.end_time || 'Hora no definida';
     
     // Agregar información adicional para diferenciar horarios similares
     let additionalInfo = '';
     if (schedule.classroom) {
       // Como el campo classroom se usa para número de grupo, mostrar como "Grupo"
       additionalInfo += ` (Grupo ${schedule.classroom})`;
-      console.log('✅ Agregando grupo:', schedule.classroom);
     } else if (schedule.instructor) {
       additionalInfo += ` (Prof: ${schedule.instructor})`;
-      console.log('✅ Agregando instructor:', schedule.instructor);
     } else {
       // Si no hay grupo ni instructor, usar los últimos 4 caracteres del ID como identificador
       const groupId = schedule.id ? schedule.id.slice(-4).toUpperCase() : 'XXXX';
       additionalInfo += ` (Grupo ${groupId})`;
-      console.log('✅ Agregando grupo automático:', groupId);
     }
     
-    const result = `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
-    console.log('🎯 Resultado final:', result);
-    return result;
+    return `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
   };
 
   return (
