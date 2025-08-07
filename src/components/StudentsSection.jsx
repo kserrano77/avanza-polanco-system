@@ -203,7 +203,10 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setScheduleDropdownOpen(!scheduleDropdownOpen)}
+                  onClick={() => {
+                    console.log('🚀 DROPDOWN BUTTON CLICKED, schedules:', schedules.length);
+                    setScheduleDropdownOpen(!scheduleDropdownOpen);
+                  }}
                   className="w-full bg-slate-700/50 border border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400/20 rounded-md px-3 py-2 text-left flex items-center justify-between hover:bg-slate-700/70"
                 >
                   <span className="flex-1 text-left">
@@ -233,11 +236,13 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                     </div>
                     {schedules.map(s => {
                       const labelText = formatScheduleLabel(s);
+                      console.log('🎯 DROPDOWN ITEM:', labelText);
                       return (
                         <div
                           key={`${s.id}-${s.classroom || 'no-group'}`}
                           className="px-3 py-2 text-white hover:bg-slate-700 cursor-pointer whitespace-nowrap"
                           onClick={() => {
+                            console.log('🔥 CLICKED SCHEDULE:', labelText, 'ID:', s.id);
                             setFormData(prev => ({ ...prev, schedule_info: s.id }));
                             setScheduleDropdownOpen(false);
                           }}
