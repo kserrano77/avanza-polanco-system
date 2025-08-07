@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { generateAttendanceListPdf } from '@/lib/pdfGenerator';
 import { format, parseISO } from 'date-fns';
 
-const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 const ScheduleDialog = ({ isOpen, setIsOpen, schedule, courses, onSave, loading }) => {
   const [formData, setFormData] = useState({ course_id: '', day_of_week: '', start_time: '', end_time: '', classroom: '', start_date: '' });
