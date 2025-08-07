@@ -235,6 +235,15 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                       Sin horario asignado
                     </div>
                     {schedules.map(s => {
+                      console.log('🔍 SCHEDULE DATA:', {
+                        id: s.id,
+                        classroom: s.classroom,
+                        instructor: s.instructor,
+                        courses: s.courses,
+                        day_of_week: s.day_of_week,
+                        start_time: s.start_time,
+                        end_time: s.end_time
+                      });
                       const labelText = formatScheduleLabel(s);
                       console.log('🎯 DROPDOWN ITEM:', labelText);
                       return (
