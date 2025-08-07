@@ -461,13 +461,27 @@ const StudentsSection = ({ students, courses, schedules, refreshData }) => {
   };
 
   const formatScheduleLabel = (schedule) => {
-    if (!schedule) return <span className="text-white/50">No asignado</span>;
+    if (!schedule) return 'No asignado';
     const day = daysOfWeek[schedule.day_of_week] || 'Día desc.';
     const startTime = schedule.start_time.slice(0, 5);
     const endTime = schedule.end_time.slice(0, 5);
     // CORREGIDO: Mostrar curso desde la relación courses del horario
     const courseName = schedule.courses?.name || 'Curso desc.';
-    return `${courseName} - ${day} ${startTime}-${endTime}`;
+    
+    // Agregar información adicional para diferenciar horarios similares
+    let additionalInfo = '';
+    if (schedule.classroom) {
+      // Como el campo classroom se usa para número de grupo, mostrar como "Grupo"
+      additionalInfo += ` (Grupo ${schedule.classroom})`;
+    } else if (schedule.instructor) {
+      additionalInfo += ` (Prof: ${schedule.instructor})`;
+    } else {
+      // Si no hay grupo ni instructor, usar los últimos 4 caracteres del ID como identificador
+      const groupId = schedule.id ? schedule.id.slice(-4).toUpperCase() : 'XXXX';
+      additionalInfo += ` (Grupo ${groupId})`;
+    }
+    
+    return `${courseName} - ${day} ${startTime}-${endTime}${additionalInfo}`;
   };
 
   return (
