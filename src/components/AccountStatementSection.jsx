@@ -2,11 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, User, Library, Printer, CheckCircle, AlertCircle, Clock, Search } from 'lucide-react';
+import { Loader2, User, Library, Printer, CheckCircle, AlertCircle, Clock, Search, ChevronDown, Check } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { format, parseISO } from 'date-fns';
@@ -20,6 +19,7 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
   const [loading, setLoading] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { toast } = useToast();
 
   // Filtrar estudiantes basado en el término de búsqueda
@@ -48,6 +48,23 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
       setPayments([]);
     }
   }, [filteredStudents, selectedStudentId]);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.combobox-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const fetchStudentStatement = useCallback(async () => {
     if (!selectedStudentId) return;
@@ -221,36 +238,59 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
         <CardHeader>
           <CardTitle className="text-white">Seleccionar Estudiante</CardTitle>
           <div className="space-y-4">
-            {/* Campo de búsqueda */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 h-4 w-4" />
-              <Input
-                placeholder="Buscar por nombre o apellido..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-10"
-              />
-            </div>
-            
-            {/* Selector de estudiante */}
-            <div className="flex gap-4 items-center">
-              <Select 
-                key={`student-select-${filteredStudents.length}-${searchTerm}`}
-                onValueChange={setSelectedStudentId} 
-                value={selectedStudentId}
-              >
-                <SelectTrigger className="input-field w-full md:w-1/2">
-                  <SelectValue placeholder="Selecciona un estudiante..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredStudents.map(student => (
-                    <SelectItem key={student.id} value={student.id}>
-                      {student.first_name} {student.last_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {loading && <Loader2 className="h-5 w-5 animate-spin text-purple-400" />}
+            {/* Combobox personalizado */}
+            <div className="relative w-full combobox-container">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 h-4 w-4" />
+                <Input
+                  placeholder="Buscar y seleccionar estudiante..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setIsDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  className="input-field pl-10 pr-10"
+                />
+                <ChevronDown 
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 h-4 w-4 transition-transform ${
+                    isDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                />
+              </div>
+              
+              {/* Dropdown personalizado */}
+              {isDropdownOpen && (
+                <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-md shadow-lg max-h-60 overflow-auto">
+                  {filteredStudents.length > 0 ? (
+                    filteredStudents.map(student => (
+                      <div
+                        key={student.id}
+                        className={`px-3 py-2 cursor-pointer hover:bg-gray-700 flex items-center justify-between ${
+                          selectedStudentId === student.id ? 'bg-purple-600/20' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedStudentId(student.id);
+                          setSearchTerm(`${student.first_name} ${student.last_name}`);
+                          setIsDropdownOpen(false);
+                        }}
+                      >
+                        <span className="text-white">
+                          {student.first_name} {student.last_name}
+                        </span>
+                        {selectedStudentId === student.id && (
+                          <Check className="h-4 w-4 text-purple-400" />
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-white/60">
+                      No se encontraron estudiantes
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             
             {/* Contador de resultados */}
@@ -258,6 +298,14 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
               <p className="text-sm text-white/60">
                 {filteredStudents.length} estudiante{filteredStudents.length !== 1 ? 's' : ''} encontrado{filteredStudents.length !== 1 ? 's' : ''}
               </p>
+            )}
+            
+            {/* Loading indicator */}
+            {loading && (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin text-purple-400" />
+                <span className="text-white/60">Cargando estado de cuenta...</span>
+              </div>
             )}
           </div>
         </CardHeader>
