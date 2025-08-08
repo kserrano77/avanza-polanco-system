@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, User, Library, Printer, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Loader2, User, Library, Printer, CheckCircle, AlertCircle, Clock, Search } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { format, parseISO } from 'date-fns';
@@ -18,7 +19,26 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
+
+  // Filtrar estudiantes basado en el término de búsqueda
+  const filteredStudents = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return students;
+    }
+    
+    const searchLower = searchTerm.toLowerCase().trim();
+    return students.filter(student => {
+      const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
+      const lastName = student.last_name.toLowerCase();
+      const firstName = student.first_name.toLowerCase();
+      
+      return fullName.includes(searchLower) || 
+             lastName.includes(searchLower) || 
+             firstName.includes(searchLower);
+    });
+  }, [students, searchTerm]);
 
   const fetchStudentStatement = useCallback(async () => {
     if (!selectedStudentId) return;
@@ -191,18 +211,41 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
       <Card className="glass-effect border-white/20">
         <CardHeader>
           <CardTitle className="text-white">Seleccionar Estudiante</CardTitle>
-          <div className="flex gap-4 items-center">
-            <Select onValueChange={setSelectedStudentId} value={selectedStudentId}>
-              <SelectTrigger className="input-field w-full md:w-1/3">
-                <SelectValue placeholder="Busca o selecciona un estudiante..." />
-              </SelectTrigger>
-              <SelectContent>
-                {students.map(student => (
-                  <SelectItem key={student.id} value={student.id}>{student.first_name} {student.last_name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {loading && <Loader2 className="h-5 w-5 animate-spin text-purple-400" />}
+          <div className="space-y-4">
+            {/* Campo de búsqueda */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 h-4 w-4" />
+              <Input
+                placeholder="Buscar por nombre o apellido..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="input-field pl-10"
+              />
+            </div>
+            
+            {/* Selector de estudiante */}
+            <div className="flex gap-4 items-center">
+              <Select onValueChange={setSelectedStudentId} value={selectedStudentId}>
+                <SelectTrigger className="input-field w-full md:w-1/2">
+                  <SelectValue placeholder="Selecciona un estudiante..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredStudents.map(student => (
+                    <SelectItem key={student.id} value={student.id}>
+                      {student.first_name} {student.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {loading && <Loader2 className="h-5 w-5 animate-spin text-purple-400" />}
+            </div>
+            
+            {/* Contador de resultados */}
+            {searchTerm && (
+              <p className="text-sm text-white/60">
+                {filteredStudents.length} estudiante{filteredStudents.length !== 1 ? 's' : ''} encontrado{filteredStudents.length !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
         </CardHeader>
       </Card>
