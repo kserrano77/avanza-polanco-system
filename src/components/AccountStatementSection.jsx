@@ -40,6 +40,15 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
     });
   }, [students, searchTerm]);
 
+  // Resetear selección si el estudiante seleccionado no está en los resultados filtrados
+  useEffect(() => {
+    if (selectedStudentId && !filteredStudents.some(student => student.id === selectedStudentId)) {
+      setSelectedStudentId('');
+      setStudentData(null);
+      setPayments([]);
+    }
+  }, [filteredStudents, selectedStudentId]);
+
   const fetchStudentStatement = useCallback(async () => {
     if (!selectedStudentId) return;
 
@@ -225,7 +234,11 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
             
             {/* Selector de estudiante */}
             <div className="flex gap-4 items-center">
-              <Select onValueChange={setSelectedStudentId} value={selectedStudentId}>
+              <Select 
+                key={`student-select-${filteredStudents.length}-${searchTerm}`}
+                onValueChange={setSelectedStudentId} 
+                value={selectedStudentId}
+              >
                 <SelectTrigger className="input-field w-full md:w-1/2">
                   <SelectValue placeholder="Selecciona un estudiante..." />
                 </SelectTrigger>
