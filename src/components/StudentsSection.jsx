@@ -66,6 +66,37 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     schedule_info: null
   }), []);
 
+  // Función para calcular el siguiente número de estudiante disponible
+  const getNextStudentNumber = async () => {
+    try {
+      const { data: students, error } = await supabase
+        .from('students')
+        .select('student_number')
+        .order('student_number', { ascending: false });
+      
+      if (error) {
+        console.error('Error obteniendo números de estudiante:', error);
+        return '1'; // Fallback al número 1
+      }
+      
+      if (!students || students.length === 0) {
+        return '1'; // Primer estudiante
+      }
+      
+      // Convertir a números y encontrar el máximo
+      const numbers = students
+        .map(s => parseInt(s.student_number))
+        .filter(n => !isNaN(n))
+        .sort((a, b) => b - a);
+      
+      const maxNumber = numbers.length > 0 ? numbers[0] : 0;
+      return String(maxNumber + 1);
+    } catch (error) {
+      console.error('Error calculando siguiente número:', error);
+      return '1';
+    }
+  };
+
   useEffect(() => {
     if (student) {
       setFormData({
@@ -75,7 +106,15 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
         enrollment_date: student.enrollment_date ? new Date(student.enrollment_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
       });
     } else {
-      setFormData(initialFormState);
+      // Para nuevo estudiante, calcular el siguiente número automáticamente
+      const loadNextNumber = async () => {
+        const nextNumber = await getNextStudentNumber();
+        setFormData({
+          ...initialFormState,
+          student_number: nextNumber
+        });
+      };
+      loadNextNumber();
     }
   }, [student, initialFormState]);
 
