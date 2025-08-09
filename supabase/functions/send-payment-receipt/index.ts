@@ -14,6 +14,8 @@ serve(async (req) => {
   try {
     const { student, payment, emailType = 'receipt' } = await req.json()
 
+    console.log('🔍 Edge Function - Datos recibidos:', { student, payment, emailType });
+
     if (!student || !payment) {
       throw new Error('Missing student or payment data')
     }
@@ -21,6 +23,16 @@ serve(async (req) => {
     if (!student.email) {
       throw new Error('Student email is required')
     }
+
+    // Validar y normalizar datos del estudiante
+    const normalizedStudent = {
+      ...student,
+      first_name: student.first_name || student.name?.split(' ')[0] || 'Estudiante',
+      last_name: student.last_name || student.name?.split(' ').slice(1).join(' ') || '',
+      full_name: student.name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Estudiante'
+    };
+
+    console.log('🔍 Edge Function - Estudiante normalizado:', normalizedStudent);
 
     // Configurar diferentes tipos de email
     let subject = '';
@@ -32,19 +44,19 @@ serve(async (req) => {
     switch (emailType) {
       case 'confirmacion':
         subject = `✅ Nuevo Pago Registrado - ${schoolName}`;
-        emailContent = generateConfirmationEmail(student, payment, schoolName, paymentDate);
+        emailContent = generateConfirmationEmail(normalizedStudent, payment, schoolName, paymentDate);
         break;
       case 'recordatorio':
         subject = `📅 Recordatorio: Pago próximo a vencer - ${schoolName}`;
-        emailContent = generateReminderEmail(student, payment, schoolName, paymentDate);
+        emailContent = generateReminderEmail(normalizedStudent, payment, schoolName, paymentDate);
         break;
       case 'vencido':
         subject = `🚨 Pago Vencido - ${schoolName}`;
-        emailContent = generateOverdueEmail(student, payment, schoolName, paymentDate);
+        emailContent = generateOverdueEmail(normalizedStudent, payment, schoolName, paymentDate);
         break;
       default:
         subject = `Comprobante de Pago - ${schoolName}`;
-        emailContent = generateReceiptEmail(student, payment, schoolName);
+        emailContent = generateReceiptEmail(normalizedStudent, payment, schoolName);
     }
 
     // Enviar email usando Resend API
@@ -57,10 +69,12 @@ serve(async (req) => {
 
     const emailData = {
       from: fromEmail,
-      to: student.email,
+      to: normalizedStudent.email,
       subject: subject,
       html: emailContent,
     };
+
+    console.log('📧 Edge Function - Enviando email a:', normalizedStudent.email);
 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
