@@ -203,6 +203,20 @@ function App() {
       } else {
         console.log('✅ Estudiantes cargados exitosamente:', studentsRes.data?.length, 'estudiantes');
         
+        // TEMPORAL: Verificar fecha de creación de MA. CONCEPCIÓN
+        const maConcepcion = studentsRes.data?.find(s => s.student_number === '62');
+        if (maConcepcion) {
+          const fechaCreacion = new Date(maConcepcion.created_at);
+          const fechaActual = new Date();
+          console.log('🔍 TEMPORAL - Fecha de MA. CONCEPCIÓN:', {
+            nombre: `${maConcepcion.first_name} ${maConcepcion.last_name}`,
+            created_at_raw: maConcepcion.created_at,
+            created_at_formatted: fechaCreacion.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' }),
+            fecha_actual: fechaActual.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' }),
+            diferencia_dias: Math.floor((fechaActual - fechaCreacion) / (1000 * 60 * 60 * 24))
+          });
+        }
+        
 
       
 
