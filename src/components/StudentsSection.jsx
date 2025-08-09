@@ -83,32 +83,17 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
         return '64'; // Primer estudiante
       }
       
-      // TEMPORAL: Log para revisar números altos
-      const numbers = students
-        .map(s => ({ num: parseInt(s.student_number), name: `${s.first_name} ${s.last_name}`, original: s.student_number }))
-        .filter(s => !isNaN(s.num))
-        .sort((a, b) => b.num - a.num);
+      // Obtener el siguiente número de estudiante disponible
+      const existingNumbers = students
+        .map(s => parseInt(s.student_number))
+        .filter(num => !isNaN(num) && num < 1000) // Filtrar números razonables
+        .sort((a, b) => a - b);
       
-      console.log('🔍 TEMPORAL - Números de estudiante más altos:', numbers.slice(0, 10));
-      
-      // Lógica simplificada y robusta
-      const allNumbers = numbers.map(s => s.num).sort((a, b) => a - b);
-      console.log(`🔍 Todos los números ordenados:`, allNumbers);
-      
-      // Filtrar números razonables (excluir obvios números de prueba como 1500+)
-      const reasonableNumbers = allNumbers.filter(n => n < 1000);
-      console.log(`🔍 Números razonables (<1000):`, reasonableNumbers);
-      
-      if (reasonableNumbers.length === 0) {
-        console.log('⚠️ No hay números razonables, empezando en 1');
+      if (existingNumbers.length === 0) {
         return '1';
       }
       
-      // Usar el número más alto razonable + 1
-      const maxReasonable = Math.max(...reasonableNumbers);
-      const nextNumber = maxReasonable + 1;
-      
-      console.log(`📊 Número más alto razonable: ${maxReasonable}, siguiente: ${nextNumber}`);
+      const nextNumber = Math.max(...existingNumbers) + 1;
       return String(nextNumber);
     } catch (error) {
       console.error('Error calculando siguiente número:', error);
