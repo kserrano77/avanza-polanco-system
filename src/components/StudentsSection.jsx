@@ -80,7 +80,7 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
       }
       
       if (!students || students.length === 0) {
-        return '1'; // Primer estudiante
+        return '64'; // Primer estudiante
       }
       
       // TEMPORAL: Log para revisar números altos
@@ -91,33 +91,24 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
       
       console.log('🔍 TEMPORAL - Números de estudiante más altos:', numbers.slice(0, 10));
       
-      // Lógica inteligente: detectar números de prueba vs números legítimos
-      const maxNumber = numbers[0].num;
+      // Lógica simplificada y robusta
+      const allNumbers = numbers.map(s => s.num).sort((a, b) => a - b);
+      console.log(`🔍 Todos los números ordenados:`, allNumbers);
       
-      // Si el número más alto es menor a 100, usar secuencia normal
-      if (maxNumber < 100) {
-        const nextNumber = maxNumber + 1;
-        console.log(`📊 Secuencia normal: ${maxNumber} → ${nextNumber}`);
-        return String(nextNumber);
+      // Filtrar números razonables (excluir obvios números de prueba como 1500+)
+      const reasonableNumbers = allNumbers.filter(n => n < 1000);
+      console.log(`🔍 Números razonables (<1000):`, reasonableNumbers);
+      
+      if (reasonableNumbers.length === 0) {
+        console.log('⚠️ No hay números razonables, empezando en 1');
+        return '1';
       }
       
-      // Si hay números > 100, verificar si hay una secuencia continua
-      // Buscar el número más alto que tenga una secuencia continua hacia abajo
-      let sequentialMax = 0;
-      const sortedNumbers = numbers.map(s => s.num).sort((a, b) => a - b);
+      // Usar el número más alto razonable + 1
+      const maxReasonable = Math.max(...reasonableNumbers);
+      const nextNumber = maxReasonable + 1;
       
-      for (let i = 1; i <= Math.max(...sortedNumbers); i++) {
-        if (sortedNumbers.includes(i)) {
-          sequentialMax = i;
-        } else {
-          break; // Se rompió la secuencia
-        }
-      }
-      
-      const nextNumber = sequentialMax + 1;
-      console.log(`📊 Secuencia continua hasta: ${sequentialMax}, siguiente: ${nextNumber}`);
-      console.log(`🔍 Números detectados:`, sortedNumbers.slice(0, 20));
-      
+      console.log(`📊 Número más alto razonable: ${maxReasonable}, siguiente: ${nextNumber}`);
       return String(nextNumber);
     } catch (error) {
       console.error('Error calculando siguiente número:', error);
