@@ -12,7 +12,12 @@ serve(async (req) => {
   }
 
   try {
-    const { student, payment, emailType = 'receipt' } = await req.json()
+    console.log('🚀 Edge Function iniciada');
+    
+    const requestBody = await req.json();
+    console.log('📦 Request body completo:', JSON.stringify(requestBody, null, 2));
+    
+    const { student, payment, emailType = 'receipt' } = requestBody;
 
     console.log('🔍 Edge Function - Datos recibidos:', { student, payment, emailType });
 
@@ -61,9 +66,14 @@ serve(async (req) => {
 
     // Enviar email usando Resend API
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    const fromEmail = Deno.env.get('FROM_EMAIL') || 'admin@avanzapolanco.edu.mx';
+    const fromEmail = Deno.env.get('FROM_EMAIL') || 'admin@avanzasystempolanco.cloud';
+    
+    console.log('🔑 Variables de entorno:');
+    console.log('- RESEND_API_KEY existe:', !!resendApiKey);
+    console.log('- FROM_EMAIL:', fromEmail);
     
     if (!resendApiKey) {
+      console.error('❌ RESEND_API_KEY no configurada');
       throw new Error('RESEND_API_KEY not configured');
     }
 
@@ -85,9 +95,14 @@ serve(async (req) => {
       body: JSON.stringify(emailData),
     });
 
+    console.log('📡 Respuesta de Resend - Status:', response.status);
+    console.log('📡 Respuesta de Resend - StatusText:', response.statusText);
+    
     const result = await response.json();
+    console.log('📡 Respuesta de Resend - Body:', result);
 
     if (!response.ok) {
+      console.error('❌ Error de Resend API:', result);
       throw new Error(`Resend API error: ${result.message || 'Unknown error'}`);
     }
 
@@ -104,17 +119,25 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('❌ Error sending email:', error);
+    console.error('❌ Error completo en Edge Function:', error);
+    console.error('❌ Error message:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    
+    const errorResponse = {
+      error: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('📤 Enviando respuesta de error:', errorResponse);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify(errorResponse),
       { 
         status: 500,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
-    );
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    )
   }
 });
 
