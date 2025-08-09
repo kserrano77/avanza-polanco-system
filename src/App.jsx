@@ -178,7 +178,7 @@ function App() {
       const [studentsRes, paymentsRes, coursesRes, schedulesRes] = await Promise.all([
         // CORREGIDO: Evitar JOIN problemático con schedules que causa duplicados
         // Solo cargar relación directa con courses y schedule_id específico
-        supabase.from('students').select('*, courses(name)').order('first_name', { ascending: true }),
+        supabase.from('students').select('*, courses(name)').order('student_number', { ascending: true }),
         supabase.from('payments').select('*, students(first_name, last_name, student_number)').order('created_at', { ascending: false }),
         supabase.from('courses').select('*').order('name', { ascending: true }),
         supabase.from('schedules').select('*, courses(name)').order('day_of_week').order('start_time')
@@ -203,17 +203,7 @@ function App() {
       } else {
         console.log('✅ Estudiantes cargados exitosamente:', studentsRes.data?.length, 'estudiantes');
         
-        // TEMPORAL: Verificar status de MA. CONCEPCIÓN
-        const maConcepcion = studentsRes.data?.find(s => s.student_number === '62');
-        if (maConcepcion) {
-          console.log('🔍 TEMPORAL - Status de MA. CONCEPCIÓN:', {
-            nombre: `${maConcepcion.first_name} ${maConcepcion.last_name}`,
-            status: maConcepcion.status,
-            statusType: typeof maConcepcion.status,
-            statusIsNull: maConcepcion.status === null,
-            statusIsUndefined: maConcepcion.status === undefined
-          });
-        }
+
       
 
         // Debug: mostrar los últimos 3 estudiantes creados para verificar si aparece el nuevo
