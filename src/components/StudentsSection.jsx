@@ -103,8 +103,12 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
       schedule_id: formData.schedule_info === 'none' || !formData.schedule_info ? null : formData.schedule_info
     };
     
-    // Remover schedule_info ya que usamos schedule_id en la BD
-    delete dataToSave.schedule_info;
+    // Remover campos que no pertenecen a la tabla students
+    delete dataToSave.schedule_info; // usamos schedule_id en la BD
+    delete dataToSave.courses; // viene del JOIN, no es campo de students
+    delete dataToSave.schedules; // viene del JOIN, no es campo de students
+    delete dataToSave.created_at; // campo automático, no debe actualizarse
+    delete dataToSave.updated_at; // campo automático, no debe actualizarse
     
     // Debug: mostrar datos que se van a guardar
     console.log('🔍 Debug - Datos a guardar:', dataToSave);
