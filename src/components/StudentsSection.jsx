@@ -93,7 +93,27 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
         return '1';
       }
       
-      const nextNumber = Math.max(...existingNumbers) + 1;
+      // Detectar secuencia continua y evitar saltos anómalos
+      // Si hay un salto grande (>10), usar el número antes del salto + 1
+      let sequentialMax = 0;
+      for (let i = 0; i < existingNumbers.length - 1; i++) {
+        const current = existingNumbers[i];
+        const next = existingNumbers[i + 1];
+        
+        // Si hay un salto mayor a 10, el número actual es el último de la secuencia
+        if (next - current > 10) {
+          sequentialMax = current;
+          break;
+        }
+      }
+      
+      // Si no se encontró salto, usar el máximo normal
+      if (sequentialMax === 0) {
+        sequentialMax = existingNumbers[existingNumbers.length - 1];
+      }
+      
+      const nextNumber = sequentialMax + 1;
+      console.log(`📊 Secuencia detectada hasta: ${sequentialMax}, siguiente: ${nextNumber}`);
       return String(nextNumber);
     } catch (error) {
       console.error('Error calculando siguiente número:', error);
