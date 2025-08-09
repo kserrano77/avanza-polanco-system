@@ -111,11 +111,12 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     console.log('🔍 Debug - formData original:', formData);
     
     // Validaciones básicas antes de enviar
-    if (!dataToSave.name || dataToSave.name.trim() === '') {
+    if ((!dataToSave.first_name || dataToSave.first_name.trim() === '') && 
+        (!dataToSave.last_name || dataToSave.last_name.trim() === '')) {
       toast({
         variant: 'destructive',
         title: 'Error de validación',
-        description: 'El nombre del estudiante es requerido'
+        description: 'El nombre o apellido del estudiante es requerido'
       });
       setIsSubmitting(false);
       return;
