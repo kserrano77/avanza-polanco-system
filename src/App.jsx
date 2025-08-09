@@ -203,6 +203,12 @@ function App() {
       } else {
         console.log('✅ Estudiantes cargados exitosamente:', studentsRes.data?.length, 'estudiantes');
       
+      // TEMPORAL: Log directo para encontrar estudiante #62 (ma.concepcion)
+      const student62 = studentsRes.data?.find(s => s.student_number === '62');
+      console.log('🔍 TEMPORAL - Estudiante #62:', student62 ? 
+        `ENCONTRADA: ${student62.first_name} ${student62.last_name} (${student62.email})` : 
+        'NO ENCONTRADA en la consulta');
+      
       // TEMPORAL: Log directo para encontrar estudiante #63
       const student63 = studentsRes.data?.find(s => s.student_number === '63');
       console.log('🔍 TEMPORAL - Estudiante #63:', student63 ? 
