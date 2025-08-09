@@ -202,6 +202,44 @@ function App() {
         console.error('❌ Detalles del error:', studentsRes.error.message, studentsRes.error.details);
       } else {
         console.log('✅ Estudiantes cargados exitosamente:', studentsRes.data?.length, 'estudiantes');
+      
+      // TEMPORAL: Log directo para encontrar estudiante #63
+      const student63 = studentsRes.data?.find(s => s.student_number === '63');
+      console.log('🔍 TEMPORAL - Estudiante #63:', student63 ? 
+        `ENCONTRADA: ${student63.first_name} ${student63.last_name} (${student63.email})` : 
+        'NO ENCONTRADA en la consulta');
+      
+      // TEMPORAL: Mostrar todos los números de estudiante para verificar
+      const studentNumbers = studentsRes.data?.map(s => s.student_number).sort();
+      console.log('🔍 TEMPORAL - Todos los números:', studentNumbers);
+        // Debug: mostrar los últimos 3 estudiantes creados para verificar si aparece el nuevo
+        const lastStudents = studentsRes.data?.slice(0, 3) || [];
+        console.log('🔍 Últimos 3 estudiantes creados:', lastStudents.map(s => ({
+          id: s.id,
+          name: `${s.first_name} ${s.last_name}`,
+          student_number: s.student_number,
+          email: s.email,
+          created_at: s.created_at
+        })));
+        
+        // Debug específico: buscar a la estudiante que falta
+        const missingStudent = studentsRes.data?.find(s => 
+          s.student_number === '63' || 
+          (s.first_name && s.first_name.toLowerCase().includes('concepcion')) ||
+          (s.last_name && s.last_name.toLowerCase().includes('hernandez'))
+        );
+        if (missingStudent) {
+          console.log('🔍 Estudiante #63 encontrada en BD:', {
+            id: missingStudent.id,
+            name: `${missingStudent.first_name} ${missingStudent.last_name}`,
+            student_number: missingStudent.student_number,
+            email: missingStudent.email,
+            created_at: missingStudent.created_at,
+            status: missingStudent.status
+          });
+        } else {
+          console.log('❌ Estudiante #63 NO encontrada en la consulta de estudiantes');
+        }
       }
       if (paymentsRes.error) console.warn('Error cargando pagos:', paymentsRes.error);
       if (coursesRes.error) console.warn('Error cargando cursos:', coursesRes.error);

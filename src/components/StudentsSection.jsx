@@ -176,7 +176,7 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
           if (result.error.message.includes('email')) {
             errorMessage = 'Ya existe un estudiante con este email. Por favor, usa un email diferente.';
           } else if (result.error.message.includes('student_number')) {
-            errorMessage = 'Ya existe un estudiante with este número. Por favor, usa un número diferente.';
+            errorMessage = 'Ya existe un estudiante con este número. Por favor, usa un número diferente.';
           } else {
             errorMessage = 'Ya existe un estudiante con estos datos. Verifica que no haya duplicados.';
           }
