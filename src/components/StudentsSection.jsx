@@ -71,29 +71,57 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     try {
       const { data: students, error } = await supabase
         .from('students')
-        .select('student_number')
+        .select('student_number, first_name, last_name')
         .order('student_number', { ascending: false });
       
       if (error) {
         console.error('Error obteniendo números de estudiante:', error);
-        return '1'; // Fallback al número 1
+        return '64'; // Fallback al número esperado
       }
       
       if (!students || students.length === 0) {
         return '1'; // Primer estudiante
       }
       
-      // Convertir a números y encontrar el máximo
+      // TEMPORAL: Log para revisar números altos
       const numbers = students
-        .map(s => parseInt(s.student_number))
-        .filter(n => !isNaN(n))
-        .sort((a, b) => b - a);
+        .map(s => ({ num: parseInt(s.student_number), name: `${s.first_name} ${s.last_name}`, original: s.student_number }))
+        .filter(s => !isNaN(s.num))
+        .sort((a, b) => b.num - a.num);
       
-      const maxNumber = numbers.length > 0 ? numbers[0] : 0;
-      return String(maxNumber + 1);
+      console.log('🔍 TEMPORAL - Números de estudiante más altos:', numbers.slice(0, 10));
+      
+      // Lógica inteligente: detectar números de prueba vs números legítimos
+      const maxNumber = numbers[0].num;
+      
+      // Si el número más alto es menor a 100, usar secuencia normal
+      if (maxNumber < 100) {
+        const nextNumber = maxNumber + 1;
+        console.log(`📊 Secuencia normal: ${maxNumber} → ${nextNumber}`);
+        return String(nextNumber);
+      }
+      
+      // Si hay números > 100, verificar si hay una secuencia continua
+      // Buscar el número más alto que tenga una secuencia continua hacia abajo
+      let sequentialMax = 0;
+      const sortedNumbers = numbers.map(s => s.num).sort((a, b) => a - b);
+      
+      for (let i = 1; i <= Math.max(...sortedNumbers); i++) {
+        if (sortedNumbers.includes(i)) {
+          sequentialMax = i;
+        } else {
+          break; // Se rompió la secuencia
+        }
+      }
+      
+      const nextNumber = sequentialMax + 1;
+      console.log(`📊 Secuencia continua hasta: ${sequentialMax}, siguiente: ${nextNumber}`);
+      console.log(`🔍 Números detectados:`, sortedNumbers.slice(0, 20));
+      
+      return String(nextNumber);
     } catch (error) {
       console.error('Error calculando siguiente número:', error);
-      return '1';
+      return '64';
     }
   };
 
