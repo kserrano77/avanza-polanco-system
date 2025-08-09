@@ -109,23 +109,82 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
     // Debug: mostrar datos que se van a guardar
     console.log('🔍 Debug - Datos a guardar:', dataToSave);
     console.log('🔍 Debug - formData original:', formData);
+    
+    // Validaciones básicas antes de enviar
+    if (!dataToSave.name || dataToSave.name.trim() === '') {
+      toast({
+        variant: 'destructive',
+        title: 'Error de validación',
+        description: 'El nombre del estudiante es requerido'
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    if (!dataToSave.email || dataToSave.email.trim() === '') {
+      toast({
+        variant: 'destructive',
+        title: 'Error de validación',
+        description: 'El email del estudiante es requerido'
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(dataToSave.email)) {
+      toast({
+        variant: 'destructive',
+        title: 'Error de validación',
+        description: 'El formato del email no es válido'
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      let error;
+      let result;
       if (student) {
         console.log('🔄 Actualizando estudiante ID:', student.id);
-        ({ error } = await supabase.from('students').update(dataToSave).eq('id', student.id));
+        console.log('🔍 Datos específicos para actualización:', JSON.stringify(dataToSave, null, 2));
+        result = await supabase.from('students').update(dataToSave).eq('id', student.id);
       } else {
         console.log('🔄 Insertando nuevo estudiante');
-        ({ error } = await supabase.from('students').insert([dataToSave]));
+        result = await supabase.from('students').insert([dataToSave]);
       }
       
-      if (error) {
-        console.warn('Error en operación de estudiante:', error);
+      console.log('🔍 Resultado completo de Supabase:', result);
+      
+      if (result.error) {
+        console.error('❌ Error detallado de Supabase:', {
+          message: result.error.message,
+          details: result.error.details,
+          hint: result.error.hint,
+          code: result.error.code
+        });
+        
+        let errorMessage = result.error.message || 'No se pudo completar la operación';
+        
+        // Manejo específico de errores comunes
+        if (result.error.code === '23505') {
+          if (result.error.message.includes('email')) {
+            errorMessage = 'Ya existe un estudiante con este email. Por favor, usa un email diferente.';
+          } else if (result.error.message.includes('student_number')) {
+            errorMessage = 'Ya existe un estudiante with este número. Por favor, usa un número diferente.';
+          } else {
+            errorMessage = 'Ya existe un estudiante con estos datos. Verifica que no haya duplicados.';
+          }
+        } else if (result.error.code === '23502') {
+          errorMessage = 'Faltan campos requeridos. Verifica que todos los campos obligatorios estén llenos.';
+        } else if (result.error.code === '23514') {
+          errorMessage = 'Los datos no cumplen con las restricciones de la base de datos.';
+        }
+        
         toast({
           variant: 'destructive',
           title: 'Error en operación',
-          description: error.message || 'No se pudo completar la operación'
+          description: errorMessage
         });
         setIsSubmitting(false);
         return;
