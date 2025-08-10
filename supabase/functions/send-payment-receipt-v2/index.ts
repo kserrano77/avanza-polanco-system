@@ -42,10 +42,10 @@ serve(async (req) => {
       subject = isReprint ? 
         `Reimpresión - Comprobante de Pago - ${normalizedStudent.full_name}` :
         `Comprobante de Pago - ${normalizedStudent.full_name}`
-      htmlContent = generateReceiptEmail(normalizedStudent, payment, 'Instituto Polanco', isReprint)
+      htmlContent = generateReceiptEmail(normalizedStudent, payment, 'Avanza Polanco', isReprint)
     } else if (emailType === 'confirmation' || payment.status === 'pending') {
       subject = `Confirmación de Pago Registrado - ${normalizedStudent.full_name}`
-      htmlContent = generateConfirmationEmail(normalizedStudent, payment, 'Instituto Polanco')
+      htmlContent = generateConfirmationEmail(normalizedStudent, payment, 'Avanza Polanco')
     } else {
       throw new Error(`Tipo de email no válido: ${emailType}`)
     }
