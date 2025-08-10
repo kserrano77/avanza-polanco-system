@@ -265,8 +265,10 @@ function generateOverdueEmail(student, payment, schoolName, paymentDate) {
 
 // Template para recibo de pago (cuando está pagado)
 function generateReceiptEmail(student, payment, schoolName, isReprint = false) {
-  const currentDate = new Date().toLocaleDateString('es-MX');
-  const reprintMessage = isReprint ? `<p style="color: #e74c3c; font-weight: bold; background: #fdf2f2; padding: 10px; border-radius: 5px; margin: 15px 0;">📄 Esta es una reimpresión de tu comprobante de pago del día ${payment.paid_date || currentDate}</p>` : '';
+  // Usar paid_date del pago o fecha actual si no existe
+  const paymentDate = payment.paid_date || new Date().toISOString().split('T')[0];
+  const formattedPaymentDate = new Date(paymentDate + 'T12:00:00').toLocaleDateString('es-MX');
+  const reprintMessage = isReprint ? `<p style="color: #e74c3c; font-weight: bold; background: #fdf2f2; padding: 10px; border-radius: 5px; margin: 15px 0;">📄 Esta es una reimpresión de tu comprobante de pago del día ${formattedPaymentDate}</p>` : '';
   
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -283,7 +285,7 @@ function generateReceiptEmail(student, payment, schoolName, isReprint = false) {
           <table style="width: 100%; border-collapse: collapse;">
             <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Concepto:</td><td style="padding: 8px 0; color: #666;">${payment.concept}</td></tr>
             <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Monto Pagado:</td><td style="padding: 8px 0; color: #666;">$${payment.amount}</td></tr>
-            <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Fecha de Pago:</td><td style="padding: 8px 0; color: #666;">${payment.paid_date || currentDate}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Fecha de Pago:</td><td style="padding: 8px 0; color: #666;">${formattedPaymentDate}</td></tr>
             <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Estado:</td><td style="padding: 8px 0; color: #28a745; font-weight: bold;">PAGADO</td></tr>
             ${(payment.debt_amount && Number(payment.debt_amount) > 0) ? `
             <tr style="border-top: 2px solid #ddd;"><td colspan="2" style="padding: 15px 0 8px 0; font-weight: bold; color: #e74c3c; font-size: 16px;">📋 INFORMACIÓN DE ADEUDO:</td></tr>
