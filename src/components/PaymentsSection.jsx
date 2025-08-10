@@ -132,7 +132,7 @@ const StudentSearchField = ({ students, selectedStudentId, onStudentSelect }) =>
 };
 
 const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSettings }) => {
-  const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', payment_date: '', debt_amount: '', debt_description: '' });
+  const [formData, setFormData] = useState({ student_id: '', amount: '', concept: '', status: 'pending', due_date: '', debt_amount: '', debt_description: '' });
   const [sendReceipt, setSendReceipt] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentConcepts, setPaymentConcepts] = useState([]);
@@ -182,7 +182,7 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
         debt_description: payment.debt_description || ''
       });
     } else {
-      setFormData({ student_id: '', amount: '', concept: '', status: 'pending', payment_date: '', debt_amount: '', debt_description: '' });
+      setFormData({ student_id: '', amount: '', concept: '', status: 'pending', due_date: '', debt_amount: '', debt_description: '' });
     }
   }, [payment, open]);
 
@@ -319,14 +319,15 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
       student_id: formData.student_id, // UUID string, no convertir a int
       amount: parseFloat(formData.amount),
       concept: formData.concept || 'Pago',
-      status: formData.status || 'pending'
+      status: formData.status || 'pending',
+      paid_date: new Date().toISOString().split('T')[0] // Fecha actual automática
     };
     
     console.log('🔍 Debug - dataToSave:', dataToSave);
     
     // Solo agregar campos opcionales si no están vacíos
-    if (formData.payment_date) {
-      dataToSave.payment_date = formData.payment_date;
+    if (formData.due_date) {
+      dataToSave.due_date = formData.due_date;
     }
     
     if (formData.status === 'paid') {
@@ -440,8 +441,8 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
             </Select>
           </div>
           <div>
-            <Label htmlFor="payment_date" className="text-slate-200 font-medium mb-2 block">Fecha de Vencimiento</Label>
-            <Input id="payment_date" type="date" value={formData.payment_date} onChange={(e) => setFormData(prev => ({ ...prev, payment_date: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
+            <Label htmlFor="due_date" className="text-slate-200 font-medium mb-2 block">Fecha de Vencimiento</Label>
+            <Input id="due_date" type="date" value={formData.due_date} onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))} className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20" />
           </div>
           
           {/* Sección de Adeudo */}
