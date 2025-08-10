@@ -251,6 +251,7 @@ const MonthlyBlock = ({
                         <TableHead className="text-white/80">Estudiante</TableHead>
                         <TableHead className="text-white/80">Concepto</TableHead>
                         <TableHead className="text-white/80">Monto</TableHead>
+                        <TableHead className="text-white/80">Fecha Pago</TableHead>
                         <TableHead className="text-white/80">Fecha Venc.</TableHead>
                         <TableHead className="text-white/80">Estado</TableHead>
                         <TableHead className="text-white/80">Acciones</TableHead>
@@ -270,7 +271,10 @@ const MonthlyBlock = ({
                             ${payment.amount.toLocaleString()}
                           </TableCell>
                           <TableCell className="text-white/80">
-                            {payment.payment_date ? format(parseISO(payment.payment_date), 'dd/MM/yyyy') : '-'}
+                            {payment.paid_date ? format(parseISO(payment.paid_date), 'dd/MM/yyyy') : '-'}
+                          </TableCell>
+                          <TableCell className="text-white/80">
+                            {payment.due_date ? format(parseISO(payment.due_date), 'dd/MM/yyyy') : '-'}
                           </TableCell>
                           <TableCell>{getStatusBadge(payment.status)}</TableCell>
                           <TableCell>
