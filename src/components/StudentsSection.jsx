@@ -113,7 +113,6 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
       }
       
       const nextNumber = sequentialMax + 1;
-      console.log(`📊 Secuencia detectada hasta: ${sequentialMax}, siguiente: ${nextNumber}`);
       return String(nextNumber);
     } catch (error) {
       console.error('Error calculando siguiente número:', error);

@@ -271,7 +271,8 @@ const PaymentForm = ({ open, setOpen, payment, students, refreshData, schoolSett
           student, 
           payment: {
             ...paymentData,
-            remaining_debt: paymentData.debt_amount || 0
+            debt_amount: paymentData.debt_amount || 0,
+            debt_description: paymentData.debt_description || 'Adeudo pendiente'
           }
         },
       });
@@ -655,7 +656,8 @@ const PaymentsSection = ({ payments, students, refreshData, schoolSettings }) =>
           student, 
           payment: {
             ...paymentData,
-            remaining_debt: paymentData.debt_amount || 0
+            debt_amount: paymentData.debt_amount || 0,
+            debt_description: paymentData.debt_description || 'Adeudo pendiente'
           }
         },
       });

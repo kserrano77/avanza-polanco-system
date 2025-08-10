@@ -203,26 +203,7 @@ function App() {
       } else {
         console.log('✅ Estudiantes cargados exitosamente:', studentsRes.data?.length, 'estudiantes');
         
-        // TEMPORAL: Verificar conteo total y números más altos para validar con recepcionista
-        const allNumbers = studentsRes.data.map(s => parseInt(s.student_number)).filter(n => !isNaN(n)).sort((a, b) => b - a);
-        console.log('🔍 VERIFICACIÓN CONTEO:');
-        console.log('📊 Total estudiantes en BD:', studentsRes.data?.length);
-        console.log('📊 Números más altos:', allNumbers.slice(0, 10));
-        console.log('📊 Número más alto encontrado:', allNumbers[0]);
-        
-        // Verificar si hay estudiantes con números altos que no se muestran
-        const highNumbers = allNumbers.filter(n => n > 63);
-        if (highNumbers.length > 0) {
-          console.log('⚠️ ATENCIÓN: Hay', highNumbers.length, 'estudiantes con números > 63:', highNumbers);
-        }
-        
-        // Contar por status si existe el campo
-        const statusCounts = {};
-        studentsRes.data.forEach(s => {
-          const status = s.status || 'sin_status';
-          statusCounts[status] = (statusCounts[status] || 0) + 1;
-        });
-        console.log('📊 Estudiantes por status:', statusCounts);
+
         
 
         // Debug: mostrar los últimos 3 estudiantes creados para verificar si aparece el nuevo
