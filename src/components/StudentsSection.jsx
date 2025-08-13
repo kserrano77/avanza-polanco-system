@@ -372,6 +372,14 @@ const StudentForm = ({ open, setOpen, student, courses, schedules, refreshData }
                   <div 
                     className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg max-h-60 overflow-y-auto z-[9999]"
                     style={{ zIndex: 9999 }}
+                    onMouseDown={(e) => {
+                      // Prevenir que clics en la scrollbar cierren el dropdown
+                      e.stopPropagation();
+                    }}
+                    onClick={(e) => {
+                      // Prevenir que clics en el contenedor cierren el dropdown
+                      e.stopPropagation();
+                    }}
                   >
                     <div 
                       className="px-3 py-2 text-slate-400 hover:bg-slate-700 cursor-pointer border-b border-slate-600 select-none"
