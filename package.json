@@ -1,6 +1,6 @@
 {
   "name": "sistema-polanco",
-  "type": "module",
+
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -41,7 +41,11 @@
     "react-helmet-async": "^2.0.5",
     "recharts": "^2.9.0",
     "tailwind-merge": "^1.14.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "whatsapp-web.js": "^1.23.0",
+    "qrcode": "^1.5.3",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "@babel/generator": "^7.27.0",

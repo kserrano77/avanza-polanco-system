@@ -255,9 +255,11 @@ export const generatePaymentsByConceptPdf = async (payments, students, concept, 
   const tableBody = conceptPayments.map(payment => {
     const student = students.find(s => s.id === payment.student_id);
     const studentName = student ? `${student.first_name} ${student.last_name}` : 'Estudiante no encontrado';
+    const studentNumber = student?.student_number || 'N/A';
     const paymentDate = payment.paid_date ? format(parseISO(payment.paid_date), 'dd/MM/yyyy') : format(parseISO(payment.created_at), 'dd/MM/yyyy');
     
     return [
+      studentNumber,
       studentName,
       `$${Number(payment.amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
       paymentDate
@@ -269,6 +271,7 @@ export const generatePaymentsByConceptPdf = async (payments, students, concept, 
   
   // Agregar fila de total
   tableBody.push([
+    { content: '', styles: { fontStyle: 'bold' } },
     { content: `Total (${conceptPayments.length} pagos):`, styles: { fontStyle: 'bold' } },
     { content: `$${totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, styles: { fontStyle: 'bold' } },
     { content: '', styles: { fontStyle: 'bold' } }
@@ -276,14 +279,15 @@ export const generatePaymentsByConceptPdf = async (payments, students, concept, 
 
   doc.autoTable({
     startY,
-    head: [['Nombre del Alumno', 'Cantidad Pagada', 'Fecha de Pago']],
+    head: [['# Alumno', 'Nombre del Alumno', 'Cantidad Pagada', 'Fecha de Pago']],
     body: tableBody,
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
     columnStyles: {
-      0: { cellWidth: 80 },
-      1: { cellWidth: 40, halign: 'right' },
-      2: { cellWidth: 40, halign: 'center' }
+      0: { cellWidth: 25, halign: 'center' },
+      1: { cellWidth: 70 },
+      2: { cellWidth: 40, halign: 'right' },
+      3: { cellWidth: 40, halign: 'center' }
     }
   });
 

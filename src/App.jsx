@@ -25,6 +25,7 @@ import Login from '@/components/Login';
 import { Loader2 } from 'lucide-react';
 import PlaceholderSection from '@/components/PlaceholderSection';
 import AuditLogSection from '@/components/AuditLogSection';
+import WhatsAppSection from '@/components/WhatsAppSection';
 import NotificationManager from '@/components/NotificationManager';
 
 const backgroundThemes = {
