@@ -1,0 +1,4 @@
+# Respaldo de school_settings - 18/8/2025, 3:38:21 p.m.
+# Total de registros: 1
+id,school_name,school_code,address,phone,email,logo_url,created_at,updated_at,background_theme,notifications_overdue_payments,notifications_upcoming_payments,school_address,school_phone,school_email,primary_color
+0575ff9f-a41c-4134-bcab-6fbb48ef1e13,Avanza Polanco,INSTITUTO_POLANCO,"Av. Polanco #123, Col. Centro, Ciudad de México",+52 55 1234 5678,contacto@institutopolanco.edu.mx,https://asqymroylemsrrmfwako.supabase.co/storage/v1/object/public/schoolassets/logos/logo_1753907537689.png,2025-07-30T17:22:14.693286+00:00,2025-08-08T06:17:33.271651+00:00,ocean,true,true,ramon Alcorta 1314,5612510794,info@asejal.com.mx,"221, 83%, 53%"

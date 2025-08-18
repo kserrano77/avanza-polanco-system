@@ -17,8 +17,8 @@ const path = require('path');
 // ========================================
 
 const SUPABASE_CONFIG = {
-    url: 'TU_SUPABASE_URL_AQUI', // Ejemplo: https://abcdefgh.supabase.co
-    key: 'TU_SUPABASE_ANON_KEY_AQUI', // Tu clave anónima de Supabase
+    url: 'https://asqymroylemsrrmfwako.supabase.co',
+    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcXltcm95bGVtc3JybWZ3YWtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTUzODgsImV4cCI6MjA2OTQzMTM4OH0.mdAX12fcUf2SWEvSd1PMA9Nrubl_qVS9j8QucaMqGfo',
 };
 
 // Directorio donde se guardarán los respaldos
@@ -28,7 +28,6 @@ const BACKUP_DIR = __dirname; // Carpeta actual (respaldo polanco)
 const TABLES_TO_BACKUP = [
     'students',
     'payments', 
-    'users',
     'courses',
     'schedules',
     'profiles',
