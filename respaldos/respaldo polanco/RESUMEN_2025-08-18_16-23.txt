@@ -1,0 +1,27 @@
+RESUMEN DEL RESPALDO - SISTEMA POLANCO
+Fecha: 18/8/2025, 4:23:40 p.m.
+Timestamp: 2025-08-18_16-23
+
+RESULTADOS:
+✅ Tablas exportadas exitosamente: 7
+❌ Tablas con errores: 0
+📊 Total de tablas procesadas: 7
+
+TABLAS RESPALDADAS:
+- students_2025-08-18_16-23.csv
+- payments_2025-08-18_16-23.csv
+- courses_2025-08-18_16-23.csv
+- schedules_2025-08-18_16-23.csv
+- profiles_2025-08-18_16-23.csv
+- cash_cuts_2025-08-18_16-23.csv
+- school_settings_2025-08-18_16-23.csv
+
+UBICACIÓN:
+C:\Users\Kevin Serrano\OneDrive\polanco-github\respaldos\respaldo polanco
+
+PRÓXIMO RESPALDO PROGRAMADO:
+Cada domingo a las 23:00 hrs (configurado en Task Scheduler)
+
+---
+Script generado por Sistema Avanza
+Para soporte: Contactar al desarrollador
