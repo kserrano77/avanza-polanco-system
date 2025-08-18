@@ -1,0 +1,21 @@
+{
+  "name": "respaldo-automatico-polanco",
+  "version": "1.0.0",
+  "description": "Script automatizado para respaldo semanal de datos de Supabase - Sistema Polanco",
+  "main": "respaldo-automatico-polanco.js",
+  "scripts": {
+    "backup": "node respaldo-automatico-polanco.js",
+    "test": "echo \"Ejecutando respaldo de prueba...\" && npm run backup"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "keywords": [
+    "backup",
+    "supabase",
+    "polanco",
+    "automation"
+  ],
+  "author": "Sistema Avanza",
+  "license": "MIT"
+}
