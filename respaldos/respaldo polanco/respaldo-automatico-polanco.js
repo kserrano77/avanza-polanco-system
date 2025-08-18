@@ -24,6 +24,9 @@ const SUPABASE_CONFIG = {
 // Directorio donde se guardarán los respaldos
 const BACKUP_DIR = __dirname; // Carpeta actual (respaldo polanco)
 
+// Configuración de limpieza automática
+const MAX_BACKUPS_TO_KEEP = 8; // Mantener últimos 8 respaldos (2 meses)
+
 // Tablas a respaldar
 const TABLES_TO_BACKUP = [
     'students',
@@ -76,6 +79,71 @@ function getTimestamp() {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     
     return `${year}-${month}-${day}_${hours}-${minutes}`;
+}
+
+/**
+ * Limpia respaldos antiguos manteniendo solo los más recientes
+ */
+function cleanupOldBackups() {
+    try {
+        console.log('🧹 Limpiando respaldos antiguos...');
+        
+        // Obtener todos los archivos de resumen (para identificar respaldos completos)
+        const files = fs.readdirSync(BACKUP_DIR);
+        const summaryFiles = files
+            .filter(file => file.startsWith('RESUMEN_') && file.endsWith('.txt'))
+            .map(file => {
+                const match = file.match(/RESUMEN_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2})\.txt/);
+                if (match) {
+                    return {
+                        file: file,
+                        timestamp: match[1],
+                        date: new Date(match[1].replace('_', 'T').replace('-', ':'))
+                    };
+                }
+                return null;
+            })
+            .filter(item => item !== null)
+            .sort((a, b) => b.date - a.date); // Más recientes primero
+        
+        console.log(`📊 Encontrados ${summaryFiles.length} respaldos completos`);
+        
+        if (summaryFiles.length <= MAX_BACKUPS_TO_KEEP) {
+            console.log(`✅ Solo ${summaryFiles.length} respaldos. No es necesario limpiar.`);
+            return;
+        }
+        
+        // Respaldos a eliminar (los más antiguos)
+        const backupsToDelete = summaryFiles.slice(MAX_BACKUPS_TO_KEEP);
+        console.log(`🗑️  Eliminando ${backupsToDelete.length} respaldos antiguos...`);
+        
+        let deletedCount = 0;
+        
+        for (const backup of backupsToDelete) {
+            const timestamp = backup.timestamp;
+            
+            // Buscar todos los archivos de este respaldo específico
+            const relatedFiles = files.filter(file => file.includes(timestamp));
+            
+            for (const file of relatedFiles) {
+                try {
+                    const filePath = path.join(BACKUP_DIR, file);
+                    fs.unlinkSync(filePath);
+                    console.log(`   🗑️  ${file}`);
+                    deletedCount++;
+                } catch (err) {
+                    console.log(`   ⚠️  Error eliminando ${file}: ${err.message}`);
+                }
+            }
+        }
+        
+        console.log(`✅ Limpieza completada: ${deletedCount} archivos eliminados`);
+        console.log(`📊 Respaldos mantenidos: ${Math.min(summaryFiles.length, MAX_BACKUPS_TO_KEEP)}`);
+        
+    } catch (err) {
+        console.error('❌ Error durante limpieza:', err.message);
+        // No fallar el respaldo por errores de limpieza
+    }
 }
 
 /**
@@ -162,6 +230,11 @@ async function runBackup() {
         // Pequeña pausa entre exportaciones
         await new Promise(resolve => setTimeout(resolve, 500));
     }
+    
+    // Limpiar respaldos antiguos ANTES de crear el resumen
+    console.log('=' .repeat(60));
+    cleanupOldBackups();
+    console.log('=' .repeat(60));
     
     // Crear archivo de resumen
     const summaryContent = `RESUMEN DEL RESPALDO - SISTEMA POLANCO
