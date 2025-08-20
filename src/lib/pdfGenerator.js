@@ -295,7 +295,7 @@ export const generatePaymentsByConceptPdf = async (payments, students, concept, 
 };
 
 export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings) => {
-  const doc = new jsPDF();
+  const doc = new jsPDF('landscape', 'mm', 'a4'); // Orientación horizontal
   let startY = await drawHeader(doc, schoolSettings, 'Reporte de Inscripciones');
 
   doc.setFontSize(12);
@@ -318,12 +318,21 @@ export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
     columnStyles: {
-      0: { cellWidth: 20 }, // # Alumno
-      1: { cellWidth: 50 }, // Nombre
-      2: { cellWidth: 40 }, // Curso
-      3: { cellWidth: 30 }, // Fecha
-      4: { cellWidth: 45 }, // Email
-      5: { cellWidth: 25 }  // Monto
+      0: { cellWidth: 18 }, // # Alumno
+      1: { cellWidth: 65 }, // Nombre
+      2: { cellWidth: 45 }, // Curso
+      3: { cellWidth: 28 }, // Fecha
+      4: { cellWidth: 60 }, // Email
+      5: { cellWidth: 30 }  // Monto Inscripción
+    },
+    styles: {
+      fontSize: 9,
+      cellPadding: 3
+    },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      fontSize: 10,
+      fontStyle: 'bold'
     }
   });
 
