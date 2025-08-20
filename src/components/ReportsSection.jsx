@@ -55,23 +55,35 @@ const ReportsSection = ({ schoolSettings }) => {
     }
     setLoading(true);
     try {
-      const [paymentsRes, studentsRes, cashCutsRes] = await Promise.all([
+      const [paymentsRes, studentsRes, cashCutsRes, enrollmentPaymentsRes] = await Promise.all([
         supabase.from('payments').select('*, students(first_name, last_name, student_number)').gte('paid_date', dateRange.from).lte('paid_date', dateRange.to),
-        supabase.from('students').select('*, courses(name), payments!inner(amount, concept, paid_date)').gte('enrollment_date', dateRange.from).lte('enrollment_date', dateRange.to).eq('payments.concept', 'Inscripción'),
-        supabase.from('cash_cuts').select('*').gte('created_at', `${dateRange.from}T00:00:00Z`).lte('created_at', `${dateRange.to}T23:59:59Z`)
+        supabase.from('students').select('*, courses(name)').gte('enrollment_date', dateRange.from).lte('enrollment_date', dateRange.to),
+        supabase.from('cash_cuts').select('*').gte('created_at', `${dateRange.from}T00:00:00Z`).lte('created_at', `${dateRange.to}T23:59:59Z`),
+        supabase.from('payments').select('student_id, amount, concept, paid_date').eq('concept', 'Inscripción').gte('paid_date', dateRange.from).lte('paid_date', dateRange.to)
       ]);
 
       // Manejar errores de manera robusta - usar arrays vacíos en lugar de fallar
       const payments = paymentsRes.error ? [] : (paymentsRes.data || []);
       const students = studentsRes.error ? [] : (studentsRes.data || []);
       const cashCuts = cashCutsRes.error ? [] : (cashCutsRes.data || []);
+      const enrollmentPayments = enrollmentPaymentsRes.error ? [] : (enrollmentPaymentsRes.data || []);
+      
+      // Combinar estudiantes con sus pagos de inscripción
+      const studentsWithPayments = students.map(student => {
+        const studentPayments = enrollmentPayments.filter(payment => payment.student_id === student.id);
+        return {
+          ...student,
+          payments: studentPayments
+        };
+      });
       
       // Solo logear errores, no fallar
       if (paymentsRes.error) console.warn('Error cargando pagos para reportes:', paymentsRes.error);
       if (studentsRes.error) console.warn('Error cargando estudiantes para reportes:', studentsRes.error);
       if (cashCutsRes.error) console.warn('Error cargando cortes de caja para reportes:', cashCutsRes.error);
+      if (enrollmentPaymentsRes.error) console.warn('Error cargando pagos de inscripción para reportes:', enrollmentPaymentsRes.error);
 
-      setReportData({ payments, students, cashCuts });
+      setReportData({ payments, students: studentsWithPayments, cashCuts });
       setTimeout(() => {
         alert(`✅ Reportes actualizados\n\nMostrando datos desde ${dateRange.from} hasta ${dateRange.to}.`);
       }, 100);
