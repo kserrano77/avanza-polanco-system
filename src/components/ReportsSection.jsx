@@ -57,7 +57,7 @@ const ReportsSection = ({ schoolSettings }) => {
     try {
       const [paymentsRes, studentsRes, cashCutsRes] = await Promise.all([
         supabase.from('payments').select('*, students(first_name, last_name, student_number)').gte('paid_date', dateRange.from).lte('paid_date', dateRange.to),
-        supabase.from('students').select('*, courses(name)').gte('enrollment_date', dateRange.from).lte('enrollment_date', dateRange.to),
+        supabase.from('students').select('*, courses(name), payments!inner(amount, concept, paid_date)').gte('enrollment_date', dateRange.from).lte('enrollment_date', dateRange.to).eq('payments.concept', 'Inscripción'),
         supabase.from('cash_cuts').select('*').gte('created_at', `${dateRange.from}T00:00:00Z`).lte('created_at', `${dateRange.to}T23:59:59Z`)
       ]);
 

@@ -303,18 +303,28 @@ export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings
   startY += 15;
 
   const tableBody = students.map(student => [
+    student.student_number || 'S/N',
     student.first_name && student.last_name ? `${student.first_name} ${student.last_name}` : 'N/A',
     student.courses?.name || student.course_name || 'N/A',
     format(parseISO(student.enrollment_date), 'dd/MM/yyyy'),
-    student.email || 'N/A'
+    student.email || 'N/A',
+    student.payments && student.payments.length > 0 ? `$${student.payments[0].amount.toLocaleString('es-MX')}` : '$0'
   ]);
 
   doc.autoTable({
     startY,
-    head: [['Nombre', 'Curso', 'Fecha de Inscripción', 'Email']],
+    head: [['# Alumno', 'Nombre', 'Curso', 'Fecha de Inscripción', 'Email', 'Monto Inscripción']],
     body: tableBody,
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
+    columnStyles: {
+      0: { cellWidth: 20 }, // # Alumno
+      1: { cellWidth: 50 }, // Nombre
+      2: { cellWidth: 40 }, // Curso
+      3: { cellWidth: 30 }, // Fecha
+      4: { cellWidth: 45 }, // Email
+      5: { cellWidth: 25 }  // Monto
+    }
   });
 
   doc.save(`reporte_inscripciones_${dateRange.from}_${dateRange.to}.pdf`);
