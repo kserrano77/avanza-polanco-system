@@ -303,15 +303,10 @@ export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings
   startY += 15;
 
   const tableBody = students.map(student => {
-    // Debug: verificar datos del estudiante
-    console.log(`📝 Procesando estudiante: ${student.first_name} ${student.last_name}`);
-    console.log(`💰 Pagos del estudiante:`, student.payments);
-    
     let enrollmentAmount = '$0';
     if (student.payments && student.payments.length > 0) {
       const amount = Number(student.payments[0].amount);
       enrollmentAmount = `$${amount.toLocaleString('es-MX')}`;
-      console.log(`💵 Monto calculado para ${student.first_name}: ${enrollmentAmount}`);
     }
     
     return [
@@ -331,12 +326,12 @@ export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
     columnStyles: {
-      0: { cellWidth: 15 }, // # Alumno
-      1: { cellWidth: 55 }, // Nombre
-      2: { cellWidth: 35 }, // Curso
-      3: { cellWidth: 25 }, // Fecha
-      4: { cellWidth: 50 }, // Email
-      5: { cellWidth: 25 }  // Monto Inscripción
+      0: { cellWidth: 12 }, // # Alumno
+      1: { cellWidth: 45 }, // Nombre
+      2: { cellWidth: 30 }, // Curso
+      3: { cellWidth: 22 }, // Fecha
+      4: { cellWidth: 40 }, // Email
+      5: { cellWidth: 22 }  // Monto Inscripción
     },
     styles: {
       fontSize: 9,
