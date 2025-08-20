@@ -59,7 +59,7 @@ const ReportsSection = ({ schoolSettings }) => {
         supabase.from('payments').select('*, students(first_name, last_name, student_number)').gte('paid_date', dateRange.from).lte('paid_date', dateRange.to),
         supabase.from('students').select('*, courses(name)').gte('enrollment_date', dateRange.from).lte('enrollment_date', dateRange.to),
         supabase.from('cash_cuts').select('*').gte('created_at', `${dateRange.from}T00:00:00Z`).lte('created_at', `${dateRange.to}T23:59:59Z`),
-        supabase.from('payments').select('student_id, amount, concept, paid_date').eq('concept', 'Inscripción').gte('paid_date', dateRange.from).lte('paid_date', dateRange.to)
+        supabase.from('payments').select('student_id, amount, concept, paid_date').ilike('concept', '%inscripci%')
       ]);
 
       // Manejar errores de manera robusta - usar arrays vacíos en lugar de fallar
@@ -68,9 +68,18 @@ const ReportsSection = ({ schoolSettings }) => {
       const cashCuts = cashCutsRes.error ? [] : (cashCutsRes.data || []);
       const enrollmentPayments = enrollmentPaymentsRes.error ? [] : (enrollmentPaymentsRes.data || []);
       
+      // Debug: Logs para entender qué está pasando
+      console.log('🔍 Debug - enrollmentPayments encontrados:', enrollmentPayments.length);
+      console.log('🔍 Debug - primeros 3 pagos de inscripción:', enrollmentPayments.slice(0, 3));
+      console.log('🔍 Debug - estudiantes en el periodo:', students.length);
+      console.log('🔍 Debug - primeros 3 estudiantes:', students.slice(0, 3).map(s => ({ id: s.id, name: `${s.first_name} ${s.last_name}` })));
+      
       // Combinar estudiantes con sus pagos de inscripción
       const studentsWithPayments = students.map(student => {
         const studentPayments = enrollmentPayments.filter(payment => payment.student_id === student.id);
+        if (studentPayments.length > 0) {
+          console.log(`💰 Estudiante ${student.first_name} ${student.last_name} tiene ${studentPayments.length} pago(s) de inscripción:`, studentPayments);
+        }
         return {
           ...student,
           payments: studentPayments
