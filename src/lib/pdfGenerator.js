@@ -326,16 +326,18 @@ export const generateEnrollmentsPdf = async (students, dateRange, schoolSettings
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
     columnStyles: {
-      0: { cellWidth: 12 }, // # Alumno
-      1: { cellWidth: 45 }, // Nombre
-      2: { cellWidth: 30 }, // Curso
-      3: { cellWidth: 22 }, // Fecha
-      4: { cellWidth: 40 }, // Email
-      5: { cellWidth: 22 }  // Monto Inscripción
+      0: { cellWidth: 18 }, // # Alumno
+      1: { cellWidth: 60 }, // Nombre
+      2: { cellWidth: 35 }, // Curso
+      3: { cellWidth: 28 }, // Fecha
+      4: { cellWidth: 55 }, // Email
+      5: { cellWidth: 30 }  // Monto Inscripción
     },
     styles: {
-      fontSize: 9,
-      cellPadding: 3
+      fontSize: 10,
+      cellPadding: 5,
+      lineColor: [200, 200, 200],
+      lineWidth: 0.5
     },
     headStyles: {
       fillColor: [41, 128, 185],
