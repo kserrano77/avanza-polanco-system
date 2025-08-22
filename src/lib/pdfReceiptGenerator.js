@@ -117,6 +117,9 @@ export async function downloadPaymentReceiptPDFAlternative(student, payment) {
     const { jsPDF } = await import('jspdf');
     
     const pdf = new jsPDF();
+    
+    // Preparar nombre del estudiante (compatible con ambas estructuras)
+    const studentName = student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Sin nombre';
   
     // Header limpio sin fondo de color
   
@@ -164,7 +167,7 @@ export async function downloadPaymentReceiptPDFAlternative(student, payment) {
   
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(10);
-    pdf.text(`Nombre: ${student.full_name}`, 20, yPosition);
+    pdf.text(`Nombre: ${studentName}`, 20, yPosition);
     yPosition += 8;
     pdf.text(`Número de Estudiante: #${student.student_number}`, 20, yPosition);
     yPosition += 8;
@@ -221,7 +224,7 @@ export async function downloadPaymentReceiptPDFAlternative(student, payment) {
              105, 280, { align: 'center' });
     
     // Descargar
-    const filename = `comprobante-pago-${student.full_name.replace(/\s+/g, '-')}-${Date.now()}.pdf`;
+    const filename = `comprobante-pago-${studentName.replace(/\s+/g, '-')}-${Date.now()}.pdf`;
     pdf.save(filename);
     
     console.log('✅ PDF descargado exitosamente (alternativo)');
