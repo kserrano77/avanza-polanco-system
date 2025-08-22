@@ -180,13 +180,13 @@ const MonthlyBlock = ({
         return;
       }
 
-      // Intentar con la función principal primero
-      let result = await downloadPaymentReceiptPDF(student, payment);
+      // Usar directamente la función jsPDF que sabemos que funciona
+      let result = await downloadPaymentReceiptPDFAlternative(student, payment);
       
-      // Si falla, usar la función alternativa (jsPDF)
+      // Si falla, intentar con la función html2pdf (fallback)
       if (!result.success) {
-        console.log('⚠️ Función principal falló, usando alternativa...');
-        result = await downloadPaymentReceiptPDFAlternative(student, payment);
+        console.log('⚠️ Función jsPDF falló, intentando html2pdf...');
+        result = await downloadPaymentReceiptPDF(student, payment);
       }
       
       if (result.success) {
