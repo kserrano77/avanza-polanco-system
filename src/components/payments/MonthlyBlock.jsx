@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Search, DollarSign, Calendar, CheckCircle, AlertCircle, Clock, Edit, Trash2, Send } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, DollarSign, Calendar, CheckCircle, AlertCircle, Clock, Edit, Trash2, Send, Download } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
+import { downloadPaymentReceiptPDF, downloadPaymentReceiptPDFAlternative } from '@/lib/pdfReceiptGenerator';
 
 const MonthlyBlock = ({ 
   monthKey, 
@@ -157,6 +158,52 @@ const MonthlyBlock = ({
         variant: "destructive",
         title: "Error",
         description: `No se pudo enviar el comprobante: ${error.message}`
+      });
+    }
+  };
+
+  // Función para descargar comprobante de pago como PDF
+  const downloadPaymentReceiptAsPDF = async (payment) => {
+    try {
+      console.log('🔍 Descargando PDF para payment:', payment);
+      const student = students.find(s => s.id === payment.student_id);
+      
+      console.log('👤 Estudiante encontrado para PDF:', student);
+      
+      if (!student) {
+        console.error('❌ No se encontró estudiante para PDF');
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se encontró la información del estudiante"
+        });
+        return;
+      }
+
+      // Intentar con la función principal primero
+      let result = await downloadPaymentReceiptPDF(student, payment);
+      
+      // Si falla, usar la función alternativa (jsPDF)
+      if (!result.success) {
+        console.log('⚠️ Función principal falló, usando alternativa...');
+        result = await downloadPaymentReceiptPDFAlternative(student, payment);
+      }
+      
+      if (result.success) {
+        toast({
+          title: "✅ PDF descargado",
+          description: "El comprobante se ha descargado exitosamente"
+        });
+      } else {
+        throw new Error(result.error || 'Error desconocido');
+      }
+
+    } catch (error) {
+      console.error('❌ Error descargando PDF:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `No se pudo descargar el PDF: ${error.message}`
       });
     }
   };
@@ -308,15 +355,26 @@ const MonthlyBlock = ({
                                 </Button>
                               )}
                               {payment.status === 'paid' && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-purple-400 hover:text-purple-300"
-                                  onClick={() => sendPaymentReceipt(payment)}
-                                  title="Reenviar comprobante"
-                                >
-                                  <Send className="w-4 h-4" />
-                                </Button>
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-purple-400 hover:text-purple-300"
+                                    onClick={() => sendPaymentReceipt(payment)}
+                                    title="Reenviar comprobante"
+                                  >
+                                    <Send className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-green-400 hover:text-green-300"
+                                    onClick={() => downloadPaymentReceiptAsPDF(payment)}
+                                    title="Descargar PDF"
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </Button>
+                                </>
                               )}
                             </div>
                           </TableCell>
