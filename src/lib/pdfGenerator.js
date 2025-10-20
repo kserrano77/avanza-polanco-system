@@ -178,14 +178,14 @@ export const generateAttendanceListPdf = async (schedule, students, schoolSettin
     startY += 15;
     
     const tableBody = students.map((student, index) => [
-      index + 1,
+      student.student_number || 'N/A',
       `${student.first_name} ${student.last_name}`,
       '' 
     ]);
 
     doc.autoTable({
         startY,
-        head: [['#', 'Nombre del Estudiante', 'Asistencia']],
+        head: [['# Alumno', 'Nombre del Estudiante', 'Asistencia']],
         body: tableBody,
         theme: 'grid',
         headStyles: { fillColor: [41, 128, 185] },
