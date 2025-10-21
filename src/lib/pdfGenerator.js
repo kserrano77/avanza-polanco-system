@@ -114,6 +114,7 @@ export const generateCashCutPdf = async (cut, cutPayments, schoolSettings) => {
   doc.text('Pagos Incluidos', 15, startY);
   startY += 8;
   const paymentsBody = cutPayments.map(p => [
+    p.students?.student_number || 'N/A',
     p.students ? `${p.students.first_name} ${p.students.last_name}` : 'Estudiante no encontrado',
     p.concept,
     `$${p.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
@@ -121,7 +122,7 @@ export const generateCashCutPdf = async (cut, cutPayments, schoolSettings) => {
   ]);
   doc.autoTable({
     startY,
-    head: [['Estudiante', 'Concepto', 'Monto', 'Fecha de Pago']],
+    head: [['# Alumno', 'Estudiante', 'Concepto', 'Monto', 'Fecha de Pago']],
     body: paymentsBody,
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
