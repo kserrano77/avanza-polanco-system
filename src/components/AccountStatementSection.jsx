@@ -22,7 +22,7 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { toast } = useToast();
 
-  // Filtrar estudiantes basado en el término de búsqueda
+  // Filtrar estudiantes basado en el término de búsqueda (nombre, apellido o número de alumno)
   const filteredStudents = useMemo(() => {
     if (!searchTerm.trim()) {
       return students;
@@ -33,10 +33,12 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
       const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
       const lastName = student.last_name.toLowerCase();
       const firstName = student.first_name.toLowerCase();
+      const studentNumber = student.student_number ? String(student.student_number).toLowerCase() : '';
       
       return fullName.includes(searchLower) || 
              lastName.includes(searchLower) || 
-             firstName.includes(searchLower);
+             firstName.includes(searchLower) ||
+             studentNumber.includes(searchLower);
     });
   }, [students, searchTerm]);
 
@@ -267,7 +269,7 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
                     filteredStudents.map(student => (
                       <div
                         key={student.id}
-                        className={`px-3 py-2 cursor-pointer hover:bg-gray-700 flex items-center justify-between ${
+                        className={`px-3 py-2 cursor-pointer hover:bg-gray-700 ${
                           selectedStudentId === student.id ? 'bg-purple-600/20' : ''
                         }`}
                         onClick={() => {
@@ -276,12 +278,21 @@ const AccountStatementSection = ({ students, schoolSettings }) => {
                           setIsDropdownOpen(false);
                         }}
                       >
-                        <span className="text-white">
-                          {student.first_name} {student.last_name}
-                        </span>
-                        {selectedStudentId === student.id && (
-                          <Check className="h-4 w-4 text-purple-400" />
-                        )}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white">
+                              {student.first_name} {student.last_name}
+                            </span>
+                            {student.student_number && (
+                              <span className="text-sm text-blue-400 font-semibold">
+                                #{student.student_number}
+                              </span>
+                            )}
+                          </div>
+                          {selectedStudentId === student.id && (
+                            <Check className="h-4 w-4 text-purple-400" />
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (
