@@ -113,13 +113,10 @@ const StudentRecordSection = ({ students }) => {
       if (studentError) throw studentError;
       setStudentData(student);
 
-      // Obtener notas del estudiante
+      // Obtener notas del estudiante (sin JOIN para evitar errores)
       const { data: notesData, error: notesError } = await supabase
         .from('student_notes')
-        .select(`
-          *,
-          created_by_profile:profiles!created_by(first_name, last_name, email)
-        `)
+        .select('*')
         .eq('student_id', studentId)
         .order('created_at', { ascending: false });
 
@@ -176,10 +173,7 @@ const StudentRecordSection = ({ students }) => {
           is_important: formData.is_important,
           created_by: user.id
         }])
-        .select(`
-          *,
-          created_by_profile:profiles!created_by(first_name, last_name, email)
-        `);
+        .select('*');
 
       if (error) throw error;
 
@@ -525,10 +519,10 @@ const StudentRecordSection = ({ students }) => {
                             <Clock className="w-3 h-3" />
                             {format(parseISO(note.created_at), "dd 'de' MMMM 'de' yyyy 'a las' HH:mm", { locale: es })}
                           </div>
-                          {note.created_by_profile && (
+                          {note.created_by && (
                             <div className="flex items-center gap-1">
                               <User className="w-3 h-3" />
-                              {note.created_by_profile.first_name} {note.created_by_profile.last_name}
+                              Registrado por usuario
                             </div>
                           )}
                         </div>
