@@ -118,7 +118,7 @@ const StudentRecordSection = ({ students }) => {
         .from('student_notes')
         .select(`
           *,
-          profiles(first_name, last_name, email)
+          created_by_profile:profiles!created_by(first_name, last_name, email)
         `)
         .eq('student_id', studentId)
         .order('created_at', { ascending: false });
@@ -178,7 +178,7 @@ const StudentRecordSection = ({ students }) => {
         }])
         .select(`
           *,
-          profiles(first_name, last_name, email)
+          created_by_profile:profiles!created_by(first_name, last_name, email)
         `);
 
       if (error) throw error;
@@ -525,10 +525,10 @@ const StudentRecordSection = ({ students }) => {
                             <Clock className="w-3 h-3" />
                             {format(parseISO(note.created_at), "dd 'de' MMMM 'de' yyyy 'a las' HH:mm", { locale: es })}
                           </div>
-                          {note.profiles && (
+                          {note.created_by_profile && (
                             <div className="flex items-center gap-1">
                               <User className="w-3 h-3" />
-                              {note.profiles.first_name} {note.profiles.last_name}
+                              {note.created_by_profile.first_name} {note.created_by_profile.last_name}
                             </div>
                           )}
                         </div>
