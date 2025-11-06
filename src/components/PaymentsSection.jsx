@@ -34,7 +34,7 @@ const StudentSearchField = ({ students, selectedStudentId, onStudentSelect }) =>
   const [isOpen, setIsOpen] = useState(false);
   const [filteredStudents, setFilteredStudents] = useState([]);
   
-  // Filtrar estudiantes basado en el término de búsqueda
+  // Filtrar estudiantes basado en el término de búsqueda (nombre, apellido o número de alumno)
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredStudents(students.slice(0, 10)); // Mostrar solo los primeros 10 si no hay búsqueda
@@ -42,9 +42,12 @@ const StudentSearchField = ({ students, selectedStudentId, onStudentSelect }) =>
       const filtered = students.filter(student => {
         const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
         const searchLower = searchTerm.toLowerCase();
+        const studentNumber = student.student_number ? String(student.student_number).toLowerCase() : '';
+        
         return fullName.includes(searchLower) || 
                student.first_name.toLowerCase().includes(searchLower) ||
-               student.last_name.toLowerCase().includes(searchLower);
+               student.last_name.toLowerCase().includes(searchLower) ||
+               studentNumber.includes(searchLower);
       });
       setFilteredStudents(filtered.slice(0, 20)); // Limitar a 20 resultados
     }
@@ -91,7 +94,7 @@ const StudentSearchField = ({ students, selectedStudentId, onStudentSelect }) =>
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
-          placeholder="Buscar por nombre o apellido..."
+          placeholder="Buscar por nombre, apellido o número de alumno..."
           className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 pr-10"
           autoComplete="off"
         />
@@ -107,8 +110,15 @@ const StudentSearchField = ({ students, selectedStudentId, onStudentSelect }) =>
               onClick={() => handleStudentSelect(student)}
               className="px-3 py-2 cursor-pointer hover:bg-slate-700 text-white border-b border-slate-700 last:border-b-0 transition-colors"
             >
-              <div className="font-medium">
-                {student.first_name} {student.last_name}
+              <div className="flex items-center justify-between">
+                <div className="font-medium">
+                  {student.first_name} {student.last_name}
+                </div>
+                {student.student_number && (
+                  <div className="text-sm text-blue-400 font-semibold">
+                    #{student.student_number}
+                  </div>
+                )}
               </div>
               {student.email && (
                 <div className="text-sm text-slate-400">
