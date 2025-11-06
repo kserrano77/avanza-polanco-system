@@ -21,6 +21,7 @@ import AccountStatementSection from '@/components/AccountStatementSection';
 import CashCutSection from '@/components/CashCutSection';
 import UserManagementSection from '@/components/UserManagementSection';
 import ConceptsManagementSection from '@/components/ConceptsManagementSection';
+import StudentRecordSection from '@/components/StudentRecordSection';
 import Login from '@/components/Login';
 import { Loader2 } from 'lucide-react';
 import PlaceholderSection from '@/components/PlaceholderSection';
@@ -298,6 +299,8 @@ function App() {
         return <PaymentsSection payments={payments} students={activeStudents} refreshData={fetchProfileAndData} schoolSettings={schoolSettings} />;
       case 'accountStatement':
         return <AccountStatementSection students={students} schoolSettings={schoolSettings} />;
+      case 'studentRecord':
+        return <StudentRecordSection students={students} />;
       case 'cashCut':
         return <CashCutSection schoolSettings={schoolSettings} refreshData={fetchProfileAndData} />;
       case 'reports':

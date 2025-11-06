@@ -25,8 +25,9 @@ const navItems = [
   { icon: Users, label: 'Alumnos', section: 'students' },
   { icon: CreditCard, label: 'Pagos', section: 'payments' },
   { icon: FileBarChart2, label: 'Edo. de Cuenta', section: 'accountStatement' },
+  { icon: FileText, label: 'Expediente', section: 'studentRecord' },
   { icon: Scissors, label: 'Corte de Caja', section: 'cashCut' },
-  { icon: FileText, label: 'Reportes', section: 'reports' },
+  { icon: FileBox, label: 'Reportes', section: 'reports' },
   // { icon: FileBox, label: 'Documentos', section: 'documents' }, // OCULTO - Para reactivar después
   { icon: BookOpen, label: 'Cursos', section: 'courses' },
   { icon: Calendar, label: 'Horarios', section: 'schedule' },
