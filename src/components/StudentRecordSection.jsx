@@ -13,7 +13,7 @@ import {
   Search, 
   Plus, 
   Phone, 
-  Handshake, 
+  UserCheck, 
   DollarSign, 
   BookOpen, 
   AlertCircle,
@@ -35,7 +35,7 @@ import { useRolePermissions } from '@/hooks/useRolePermissions';
 // Categorías de notas con iconos y colores
 const NOTE_CATEGORIES = [
   { value: 'phone', label: 'Llamada Telefónica', icon: Phone, color: 'bg-blue-500', textColor: 'text-blue-500' },
-  { value: 'agreement', label: 'Acuerdo/Compromiso', icon: Handshake, color: 'bg-green-500', textColor: 'text-green-500' },
+  { value: 'agreement', label: 'Acuerdo/Compromiso', icon: UserCheck, color: 'bg-green-500', textColor: 'text-green-500' },
   { value: 'payment', label: 'Seguimiento de Pago', icon: DollarSign, color: 'bg-yellow-500', textColor: 'text-yellow-500' },
   { value: 'academic', label: 'Asunto Académico', icon: BookOpen, color: 'bg-purple-500', textColor: 'text-purple-500' },
   { value: 'general', label: 'Nota General', icon: FileText, color: 'bg-gray-500', textColor: 'text-gray-500' },
